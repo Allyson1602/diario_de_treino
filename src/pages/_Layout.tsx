@@ -6,7 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { theme } from "../configs/themes/theme";
+import { nativeBaseConfig, theme } from "../configs/themes/theme";
 import { fetchPoppinsFonts } from "../configs/fonts/poppins";
 import * as SplashScreen from "expo-splash-screen";
 import { NavigationContainer } from "@react-navigation/native";
@@ -46,10 +46,16 @@ export const Layout: FunctionComponent<PropsWithChildren> = ({ children }) => {
   }
 
   return (
-    <NativeBaseProvider theme={theme}>
+    <NativeBaseProvider theme={theme} config={nativeBaseConfig}>
       <NavigationContainer onReady={onLayoutRootView}>
         <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{
+              headerShown: false,
+            }}
+          />
           <Stack.Screen name="Training" component={Training} />
           <Stack.Screen name="Workout" component={Workout} />
         </Stack.Navigator>

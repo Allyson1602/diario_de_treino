@@ -1,10 +1,11 @@
-import moment from "moment";
+import moment, { Moment } from "moment";
 import {
   Badge,
   HStack,
   Icon,
   IconButton,
   Pressable,
+  ScrollView,
   Text,
   VStack,
 } from "native-base";
@@ -15,7 +16,7 @@ export interface CardProps {
   title: string;
   count: number;
   muscles: string[];
-  date?: Date;
+  date?: Date | Moment;
   onRemove?: () => void;
 }
 
@@ -31,31 +32,51 @@ export const Card: FunctionComponent<CardProps> = (props) => {
       flexDirection={"row"}
     >
       <VStack flexGrow={1} space={"4"}>
-        <HStack justifyContent={"space-between"}>
-          <HStack space={"2"}>
+        <HStack justifyContent={"space-between"} space={"4"}>
+          <HStack space={"2"} alignItems={"center"} flex={1}>
             <Text
-              fontSize={"xl"}
+              fontSize={"md"}
               fontWeight={"medium"}
               color={"text.700"}
               numberOfLines={1}
             >
               {props.title}
             </Text>
-            <Badge variant={"outline"} rounded={"md"}>
+            <Badge
+              variant={"outline"}
+              rounded={"md"}
+              px={"1"}
+              h={"5"}
+              borderRadius={"sm"}
+              borderColor={"gray.300"}
+              _text={{
+                color: "gray.300",
+              }}
+            >
               {props.count}
             </Badge>
           </HStack>
 
-          {props.date && <Text>{moment(props.date).fromNow()}</Text>}
+          {props.date && (
+            <Text fontSize={"xs"} color={"text.400"} backgroundColor={"#ff0"}>
+              {moment(props.date).fromNow()}
+            </Text>
+          )}
         </HStack>
 
-        <HStack space={"1"}>
+        <ScrollView
+          horizontal
+          contentContainerStyle={{
+            gap: 4,
+          }}
+          showsHorizontalScrollIndicator={false}
+        >
           {props.muscles.map((muscleItem) => (
             <Badge
               rounded={"md"}
               key={muscleItem}
               _text={{
-                fontSize: "md",
+                fontSize: "xs",
                 color: "text.800",
               }}
               backgroundColor={"gray.300"}
@@ -63,13 +84,13 @@ export const Card: FunctionComponent<CardProps> = (props) => {
               {muscleItem}
             </Badge>
           ))}
-        </HStack>
+        </ScrollView>
       </VStack>
 
       {props.onRemove && (
         <IconButton
           onPress={props.onRemove}
-          icon={<Icon as={<TrashSimple size={33} />} color={"error.600"} />}
+          icon={<Icon as={<TrashSimple size={27} />} color={"error.600"} />}
           alignSelf={"center"}
           rounded={"full"}
           _pressed={{

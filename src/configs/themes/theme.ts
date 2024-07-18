@@ -1,4 +1,11 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { extendTheme } from "native-base";
+
+export const nativeBaseConfig = {
+  dependencies: {
+    "linear-gradient": LinearGradient,
+  },
+};
 
 export const theme = extendTheme({
   fontConfig: {
