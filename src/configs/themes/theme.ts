@@ -8,6 +8,32 @@ export const nativeBaseConfig = {
 };
 
 export const theme = extendTheme({
+  colors: {
+    primary: {
+      50: "#fff1f2",
+      100: "#ffe4e6",
+      200: "#fecdd3",
+      300: "#fda4af",
+      400: "#fb7185",
+      500: "#f43f5e",
+      600: "#e11d48",
+      700: "#be123c",
+      800: "#9f1239",
+      900: "#881337",
+    },
+    secondary: {
+      50: "#F3EDF7",
+      100: "#D8CDE5",
+      200: "#B99ACF",
+      300: "#9967B9",
+      400: "#7D429D",
+      500: "#602D7F",
+      600: "#502469",
+      700: "#3E1D5C",
+      800: "#2F1446",
+      900: "#200C30",
+    },
+  },
   fontConfig: {
     Poppins: {
       100: {
