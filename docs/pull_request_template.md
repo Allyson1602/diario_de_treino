@@ -6,7 +6,7 @@ Insira aqui informações sobre a sua issue, o que ela visa resolver de problema
 
 Drafts: Colocar o que deve ser finalizado antes do merge (se organize por aqui, listando o que você precisa fazer)
 
-- [] ...
+- [ ] ...
 
 Fixes #(numero da issue) ou link para o cartão do ORA
 
