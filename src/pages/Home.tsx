@@ -1,7 +1,7 @@
+import moment from "moment";
 import { Box, Button, ScrollView, Text, VStack } from "native-base";
 import { FunctionComponent } from "react";
 import { Card } from "../components/Card";
-import moment from "moment";
 
 export const Home: FunctionComponent = () => {
   const motivationMessage =
@@ -27,7 +27,7 @@ export const Home: FunctionComponent = () => {
 
         <ScrollView
           contentContainerStyle={{
-            gap: 24,
+            gap: 8,
             padding: 8,
           }}
           showsVerticalScrollIndicator={false}
@@ -59,6 +59,7 @@ export const Home: FunctionComponent = () => {
             color: "rose.600",
             fontWeight: "medium",
           }}
+          borderColor={"rose.600"}
         >
           Novo treino
         </Button>
