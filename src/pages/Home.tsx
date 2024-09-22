@@ -1,14 +1,14 @@
 import moment from "moment";
-import { Box, Button, ScrollView, Text, VStack } from "native-base";
+import { Box, Button, HStack, ScrollView, Text, VStack } from "native-base";
 import { FunctionComponent } from "react";
-import { Card } from "../components/Card";
+import { Card } from "../components/Card/index";
 import { MotivationPhrases } from "../components/MotivationalPhrases";
 
 export const Home: FunctionComponent = () => {
   return (
     <Box
       safeArea
-      p={"6"}
+      py={"6"}
       flex={1}
       background={{
         linearGradient: {
@@ -18,35 +18,36 @@ export const Home: FunctionComponent = () => {
         },
       }}
     >
-      <VStack space={"2"} flex={1}>
-        <Text color={"text.500"} fontSize={"sm"}>
+      <VStack flex={1}>
+        <Text color={"text.500"} fontSize={"sm"} px={"6"}>
           Seus treinos montados
         </Text>
 
         <ScrollView
           contentContainerStyle={{
             gap: 8,
-            padding: 8,
+            paddingVertical: 8,
+            paddingHorizontal: 24,
           }}
           showsVerticalScrollIndicator={false}
         >
-          <Card
-            title="Poder Total"
-            count={8}
-            date={moment("01/01/2024", "DD/MM/YYYY")}
-            muscles={["tríceps", "peito", "ombro"]}
-          />
+          <Card.Container onPress={() => {}}>
+            <VStack flexGrow={1} space={"4"}>
+              <HStack justifyContent={"space-between"} space={"4"}>
+                <Card.Title text="Poder Total" />
 
-          <Card
-            title="Poder Total"
-            count={8}
-            date={moment("01/01/2024", "DD/MM/YYYY")}
-            muscles={["tríceps", "peito", "ombro"]}
-          />
+                <Card.LastTrainingDate
+                  lastTraining={moment("01/01/2024", "DD/MM/YYYY")}
+                />
+              </HStack>
+
+              <Card.MuscleChips muscleNames={["tríceps", "peito", "ombro"]} />
+            </VStack>
+          </Card.Container>
         </ScrollView>
       </VStack>
 
-      <VStack space={"10"} pt={"4"}>
+      <VStack space={"10"} pt={"4"} px={"6"}>
         <MotivationPhrases />
 
         <Button
