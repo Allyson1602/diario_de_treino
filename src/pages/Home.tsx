@@ -2,11 +2,9 @@ import moment from "moment";
 import { Box, Button, ScrollView, Text, VStack } from "native-base";
 import { FunctionComponent } from "react";
 import { Card } from "../components/Card";
+import { MotivationPhrases } from "../components/MotivationalPhrases";
 
 export const Home: FunctionComponent = () => {
-  const motivationMessage =
-    "Faça hoje o que outros não querem, viva amanhã como outros não podem.";
-
   return (
     <Box
       safeArea
@@ -49,9 +47,7 @@ export const Home: FunctionComponent = () => {
       </VStack>
 
       <VStack space={"10"} pt={"4"}>
-        <Text fontWeight={"medium"} textAlign={"center"}>
-          {motivationMessage}
-        </Text>
+        <MotivationPhrases />
 
         <Button
           variant={"outline"}

@@ -27,7 +27,7 @@ export const MotivationPhrases: FunctionComponent = () => {
     let randomIndexPhrase = Math.random() * motivationPhrases.length;
     randomIndexPhrase = Math.floor(randomIndexPhrase);
 
-    return motivationPhrases[randomIndexPhrase - 1];
+    return motivationPhrases[randomIndexPhrase];
   };
 
   const defineRandomPhrase = () => {
