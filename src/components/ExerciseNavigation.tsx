@@ -44,7 +44,7 @@ export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (
   };
 
   return (
-    <HStack justifyContent={"space-around"}>
+    <HStack justifyContent={"space-around"} w={"full"}>
       <CustomAnimated.IconButton
         onPress={handlePressLeft}
         rounded={"full"}
