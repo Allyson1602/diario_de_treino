@@ -1,26 +1,46 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useFocusEffect } from "@react-navigation/native";
 import moment from "moment";
-import { IconButton, Input, useTheme, VStack } from "native-base";
-import { FunctionComponent, useState } from "react";
+import { Center, Input, useTheme, VStack } from "native-base";
+import { FunctionComponent, useCallback, useState } from "react";
 import { ViewStyle } from "react-native";
 import { TextInputMask } from "react-native-masked-text";
+import {
+  SharedValue,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { CustomAnimated } from "./ui/CustomAnimated";
+
+const INITIAL_TIMER_VALUE = "4:00";
+const MIN_TIMER_VALUE = "0:00";
 
 interface ExerciseTimerProps {
-  onPress: () => void;
+  onPressTimer: () => void;
+  onTimerEnd?: () => void;
   containerStyle?: ViewStyle;
 }
 
 export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
   const theme = useTheme();
+  const scaleTimer = useSharedValue(1);
+  const scaleRestart = useSharedValue(1);
 
   const [toggleTimer, setToggleTimer] = useState(false);
-  const [timerValue, setTimerValue] = useState("4:00");
+  const [timerValue, setTimerValue] = useState(INITIAL_TIMER_VALUE);
   const [timerInterval, setTimerInterval] = useState<
     NodeJS.Timeout | undefined
   >();
 
+  const defineAnimationOnPress = (scale: SharedValue<number>) => {
+    scale.value = withTiming(0.9, { duration: 100 }, () => {
+      scale.value = withTiming(1);
+    });
+  };
+
   const startTimer = (): void => {
     let updateTimer = timerValue;
+    setToggleTimer(true);
 
     const newInterval = setInterval(() => {
       if (timerInterval) return;
@@ -28,38 +48,69 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
       const subtractTimer = moment(updateTimer, "m:ss").subtract(1, "seconds");
 
       updateTimer = subtractTimer.format("m:ss");
-      console.log(updateTimer);
       setTimerValue(updateTimer);
     }, 1000);
 
     setTimerInterval(newInterval);
   };
 
-  const stopTimer = () => {
-    clearInterval(timerInterval);
-    setTimerValue("4:00");
-    setTimerInterval(undefined);
+  const restartTimer = () => {
+    setTimerValue(INITIAL_TIMER_VALUE);
   };
 
-  const handlePress = () => {
-    const activatedTimer = !toggleTimer;
+  const stopTimer = () => {
+    clearInterval(timerInterval);
+    setTimerInterval(undefined);
+    setToggleTimer(false);
+  };
 
-    setToggleTimer(activatedTimer);
-
-    if (activatedTimer) {
+  const defineTimer = () => {
+    if (!toggleTimer) {
       startTimer();
     } else {
       stopTimer();
     }
-
-    props.onPress();
   };
+
+  const handlePressTimer = () => {
+    defineAnimationOnPress(scaleTimer);
+
+    defineTimer();
+
+    props.onPressTimer();
+  };
+
+  const handlePressRestart = () => {
+    defineAnimationOnPress(scaleRestart);
+
+    stopTimer();
+    restartTimer();
+  };
+
+  const handleChangeTimerValue = (text: string) => {
+    setTimerValue(text);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (timerValue === MIN_TIMER_VALUE) {
+        stopTimer();
+        setToggleTimer(false);
+        setTimerValue(INITIAL_TIMER_VALUE);
+
+        props.onTimerEnd?.();
+      }
+    }, [timerValue])
+  );
 
   return (
     <VStack style={props.containerStyle}>
       <TextInputMask
         type={"datetime"}
         value={timerValue}
+        onChangeText={handleChangeTimerValue}
+        readOnly={toggleTimer}
+        selectTextOnFocus
         options={{
           format: "m:ss",
         }}
@@ -70,23 +121,47 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
           size: "xl",
           color: "primary.500",
           fontWeight: "medium",
-          pt: "0",
+          py: "0",
         }}
       />
 
-      <IconButton
-        onPress={handlePress}
-        icon={
-          <Ionicons
-            name={!toggleTimer ? "play-outline" : "stop-outline"}
-            size={64}
-            color={theme.colors.white + "CC"}
-          />
-        }
-        bgColor={"primary.500"}
-        alignSelf={"center"}
-        rounded={"full"}
-      />
+      <Center position={"relative"}>
+        <CustomAnimated.IconButton
+          onPress={handlePressTimer}
+          icon={
+            <Ionicons
+              name={toggleTimer ? "stop-outline" : "play-outline"}
+              size={64}
+              color={theme.colors.white + "CC"}
+            />
+          }
+          bgColor={"primary.500"}
+          alignSelf={"center"}
+          rounded={"full"}
+          style={{ transform: [{ scale: scaleTimer }] }}
+        />
+
+        <CustomAnimated.IconButton
+          onPress={handlePressRestart}
+          icon={
+            <Ionicons
+              name="reload"
+              size={24}
+              color={theme.colors.white + "CC"}
+              style={{
+                transform: [{ rotateY: "180deg" }],
+              }}
+            />
+          }
+          size={"xs"}
+          position={"absolute"}
+          bottom={-24}
+          bgColor={"primary.300"}
+          alignSelf={"center"}
+          rounded={"full"}
+          style={{ transform: [{ scale: scaleRestart }] }}
+        />
+      </Center>
     </VStack>
   );
 };
