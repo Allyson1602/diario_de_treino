@@ -12,7 +12,7 @@ import {
 } from "react-native-reanimated";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
-const INITIAL_TIMER_VALUE = "4:00";
+const DEFAULT_TIMER_VALUE = "1:30"; // alterar para dentro do componente receber valor salvo no local storage ou esse valor
 const MIN_TIMER_VALUE = "0:00";
 
 interface ExerciseTimerProps {
@@ -27,7 +27,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
   const scaleRestart = useSharedValue(1);
 
   const [toggleTimer, setToggleTimer] = useState(false);
-  const [timerValue, setTimerValue] = useState(INITIAL_TIMER_VALUE);
+  const [timerValue, setTimerValue] = useState(DEFAULT_TIMER_VALUE);
   const [timerInterval, setTimerInterval] = useState<
     NodeJS.Timeout | undefined
   >();
@@ -55,7 +55,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
   };
 
   const restartTimer = () => {
-    setTimerValue(INITIAL_TIMER_VALUE);
+    setTimerValue(DEFAULT_TIMER_VALUE);
   };
 
   const stopTimer = () => {
@@ -96,7 +96,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
       if (timerValue === MIN_TIMER_VALUE) {
         stopTimer();
         setToggleTimer(false);
-        setTimerValue(INITIAL_TIMER_VALUE);
+        setTimerValue(DEFAULT_TIMER_VALUE);
 
         props.onTimerEnd?.();
       }
