@@ -3,7 +3,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import moment from "moment";
 import { Center, Input, useTheme, VStack } from "native-base";
 import { FunctionComponent, useCallback, useState } from "react";
-import { ViewStyle } from "react-native";
+import { Keyboard, ViewStyle } from "react-native";
 import { TextInputMask } from "react-native-masked-text";
 import {
   SharedValue,
@@ -12,13 +12,15 @@ import {
 } from "react-native-reanimated";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
-const DEFAULT_TIMER_VALUE = "1:30"; // alterar para dentro do componente receber valor salvo no local storage ou esse valor
 const MIN_TIMER_VALUE = "0:00";
+const MAX_SECONDS = 59;
 
 interface ExerciseTimerProps {
+  onChangeTimerValue: (text: string) => void;
   onPressTimer: () => void;
   onTimerEnd?: () => void;
   containerStyle?: ViewStyle;
+  timerValue: string;
 }
 
 export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
@@ -27,7 +29,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
   const scaleRestart = useSharedValue(1);
 
   const [toggleTimer, setToggleTimer] = useState(false);
-  const [timerValue, setTimerValue] = useState(DEFAULT_TIMER_VALUE);
+  const [timerValue, setTimerValue] = useState(props.timerValue);
   const [timerInterval, setTimerInterval] = useState<
     NodeJS.Timeout | undefined
   >();
@@ -55,7 +57,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
   };
 
   const restartTimer = () => {
-    setTimerValue(DEFAULT_TIMER_VALUE);
+    setTimerValue(props.timerValue);
   };
 
   const stopTimer = () => {
@@ -88,7 +90,20 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
   };
 
   const handleChangeTimerValue = (text: string) => {
-    setTimerValue(text);
+    const splitTimer: string[] = text.split(":");
+
+    const isValidSeconds = Number(splitTimer[1]) <= MAX_SECONDS ? true : false;
+
+    if (isValidSeconds === false && text.length === 4) {
+      props.onChangeTimerValue(`${splitTimer[0]}:${MAX_SECONDS}`);
+      return;
+    }
+
+    props.onChangeTimerValue(text);
+
+    if (text.length === 4) {
+      Keyboard.dismiss();
+    }
   };
 
   useFocusEffect(
@@ -96,11 +111,17 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
       if (timerValue === MIN_TIMER_VALUE) {
         stopTimer();
         setToggleTimer(false);
-        setTimerValue(DEFAULT_TIMER_VALUE);
+        setTimerValue(props.timerValue);
 
         props.onTimerEnd?.();
       }
     }, [timerValue])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      setTimerValue(props.timerValue);
+    }, [props.timerValue])
   );
 
   return (
