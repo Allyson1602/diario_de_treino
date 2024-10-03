@@ -8,7 +8,7 @@ export const Home: FunctionComponent = () => {
   return (
     <Box
       safeArea
-      py={"6"}
+      pt={"6"}
       flex={1}
       background={{
         linearGradient: {
@@ -47,18 +47,30 @@ export const Home: FunctionComponent = () => {
         </ScrollView>
       </VStack>
 
-      <VStack space={"10"} pt={"4"} px={"6"}>
-        <MotivationPhrases />
+      <VStack space={"5"}>
+        <VStack space={"10"} pt={"4"} px={"6"}>
+          <MotivationPhrases />
+
+          <Button
+            variant={"outline"}
+            _text={{
+              color: "rose.600",
+              fontWeight: "medium",
+            }}
+            borderColor={"rose.600"}
+          >
+            Novo treino
+          </Button>
+        </VStack>
 
         <Button
-          variant={"outline"}
-          _text={{
-            color: "rose.600",
-            fontWeight: "medium",
-          }}
-          borderColor={"rose.600"}
+          w={"full"}
+          bgColor={"purple.500"}
+          rounded={"none"}
+          p={"0.5"}
+          size={"sm"}
         >
-          Novo treino
+          Apoie nosso projeto
         </Button>
       </VStack>
     </Box>
