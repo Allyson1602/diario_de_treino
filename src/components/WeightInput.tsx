@@ -41,7 +41,7 @@ export const WeightInput: FunctionComponent = () => {
         }}
         variant={"unstyled"}
       >
-        -2,5Kg
+        -2,5kg
       </Button>
 
       <Input
@@ -71,7 +71,7 @@ export const WeightInput: FunctionComponent = () => {
         }}
         variant={"unstyled"}
       >
-        +2,5Kg
+        +2,5kg
       </Button>
     </HStack>
   );
