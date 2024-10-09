@@ -1,27 +1,40 @@
-import { HStack, Button, Input } from "native-base";
-import { FunctionComponent, useState } from "react";
+import { Button, HStack, Input } from "native-base";
+import { FunctionComponent } from "react";
 
-export const WeightInput: FunctionComponent = () => {
-  const [weightValue, setWeightValue] = useState("0");
+const MAX_INPUT_VALUE = 999;
+const MIN_INPUT_VALUE = 0;
 
+interface WeightInputProps {
+  onPressPlus?: (newValue: number) => void;
+  onPressLess?: (newValue: number) => void;
+  onChangeInput: (value: number | null) => void;
+  value: number | null;
+}
+
+export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
   const handlePressLess = () => {
-    const newValue = parseFloat(weightValue) - 2.5;
-    if (newValue >= 0) {
-      setWeightValue(newValue.toString());
+    if (props.value && props.value >= MIN_INPUT_VALUE) {
+      props.onPressLess?.(props.value - 2.5);
     }
   };
 
   const handlePressPlus = () => {
-    const newValue = parseFloat(weightValue) + 2.5;
-    if (newValue <= 999) {
-      setWeightValue(newValue.toString());
+    const numericValue = props.value || 2.5;
+
+    if (props.value && numericValue <= MAX_INPUT_VALUE) {
+      props.onPressPlus?.(numericValue + 2.5);
     }
   };
 
   const handleChangeWeight = (text: string) => {
     const numericValue = parseFloat(text);
-    if (!isNaN(numericValue) && numericValue >= 0 && numericValue <= 999) {
-      setWeightValue(text);
+
+    if (
+      !isNaN(numericValue) &&
+      numericValue >= MIN_INPUT_VALUE &&
+      numericValue <= MAX_INPUT_VALUE
+    ) {
+      props.onChangeInput(numericValue);
     }
   };
 
@@ -29,7 +42,9 @@ export const WeightInput: FunctionComponent = () => {
     <HStack justifyContent={"center"}>
       <Button
         onPress={handlePressLess}
-        isDisabled={parseFloat(weightValue) <= 0}
+        isDisabled={
+          props.value && props.value <= MIN_INPUT_VALUE ? true : false
+        }
         _text={{
           color: "text.500",
         }}
@@ -53,13 +68,15 @@ export const WeightInput: FunctionComponent = () => {
         textAlign={"center"}
         size={"lg"}
         width={"20"}
-        value={weightValue}
+        value={String(props.value)}
         onChangeText={handleChangeWeight}
       />
 
       <Button
         onPress={handlePressPlus}
-        isDisabled={parseFloat(weightValue) >= 999}
+        isDisabled={
+          props.value && props.value <= MAX_INPUT_VALUE ? true : false
+        }
         _text={{
           color: "text.500",
         }}
