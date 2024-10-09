@@ -16,7 +16,6 @@ import { FunctionComponent } from "react";
 import QRCodePixImage from "../../assets/images/app/qrcode_pix.png";
 import { Card } from "../components/Card/index";
 import { MotivationPhrases } from "../components/MotivationalPhrases";
-import {WeightInput} from "../components/WeightInput";
 
 export const Home: FunctionComponent = () => {
   const theme = useTheme();
@@ -36,8 +35,7 @@ export const Home: FunctionComponent = () => {
           },
         }}
       >
-        <WeightInput/>
-        {/* <VStack flex={1}>
+        <VStack flex={1}>
           <Text color={"text.500"} fontSize={"sm"} px={"6"}>
             Seus treinos montados
           </Text>
@@ -92,7 +90,7 @@ export const Home: FunctionComponent = () => {
           >
             Apoie nosso projeto
           </Button>
-        </VStack> */}
+        </VStack>
       </Box>
 
       <Actionsheet isOpen={isOpen} onClose={onClose}>
