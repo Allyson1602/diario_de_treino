@@ -5,24 +5,22 @@ const MAX_INPUT_VALUE = 999;
 const MIN_INPUT_VALUE = 0;
 
 interface WeightInputProps {
-  onPressPlus?: (newValue: number) => void;
-  onPressLess?: (newValue: number) => void;
-  onChangeInput: (value: number | null) => void;
-  value: number | null;
+  onPressPlus: (newValue: number) => void;
+  onPressLess: (newValue: number) => void;
+  onChangeInput: (value: number) => void;
+  value: number;
 }
 
 export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
   const handlePressLess = () => {
-    if (props.value && props.value >= MIN_INPUT_VALUE) {
-      props.onPressLess?.(props.value - 2.5);
+    if (props.value >= MIN_INPUT_VALUE) {
+      props.onPressLess(props.value - 2.5);
     }
   };
 
   const handlePressPlus = () => {
-    const numericValue = props.value || 2.5;
-
-    if (props.value && numericValue <= MAX_INPUT_VALUE) {
-      props.onPressPlus?.(numericValue + 2.5);
+    if (props.value <= MAX_INPUT_VALUE) {
+      props.onPressPlus(props.value + 2.5);
     }
   };
 
@@ -42,9 +40,7 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
     <HStack justifyContent={"center"}>
       <Button
         onPress={handlePressLess}
-        isDisabled={
-          props.value && props.value <= MIN_INPUT_VALUE ? true : false
-        }
+        isDisabled={props.value <= MIN_INPUT_VALUE}
         _text={{
           color: "text.500",
         }}
@@ -68,15 +64,13 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
         textAlign={"center"}
         size={"lg"}
         width={"20"}
-        value={String(props.value)}
+        value={props.value.toString()}
         onChangeText={handleChangeWeight}
       />
 
       <Button
         onPress={handlePressPlus}
-        isDisabled={
-          props.value && props.value <= MAX_INPUT_VALUE ? true : false
-        }
+        isDisabled={props.value >= MAX_INPUT_VALUE}
         _text={{
           color: "text.500",
         }}
