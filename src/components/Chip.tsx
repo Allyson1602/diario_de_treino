@@ -23,6 +23,7 @@ export const Chip: FunctionComponent<ChipProps> = (props) => {
         bgColor={active ? "white" : "transparent"}
         _text={{
           color: active ? "lightBlue.600" : "white",
+          fontSize: "sm",
         }}
       >
         {props.text}
