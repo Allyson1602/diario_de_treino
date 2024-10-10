@@ -16,6 +16,7 @@ import { toastConfig } from "../configs/toast";
 import { Home } from "./Home";
 import { Training } from "./Training";
 import { Workout } from "./Workout";
+import { StatusBar } from "expo-status-bar";
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
@@ -49,6 +50,8 @@ export const Layout: FunctionComponent<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
+      <StatusBar style="auto" animated />
+
       <NativeBaseProvider theme={theme} config={nativeBaseConfig}>
         <NavigationContainer onReady={onLayoutRootView}>
           <Stack.Navigator initialRouteName="Home">
