@@ -5,27 +5,36 @@ export interface IMuscleGroups {
 
 export const muscleGroups: IMuscleGroups[] = [
   {
-    groupName: "Chest",
-    mainMuscles: ["Peitoral"],
+    groupName: "Peitoral",
+    mainMuscles: ["Peitoral Maior", "Peitoral Menor"],
   },
   {
-    groupName: "Back",
-    mainMuscles: ["Dorsais", "Trapézio", "Lombar (Eretor da espinha)"],
+    groupName: "Costas",
+    mainMuscles: ["Dorsal", "Trapézio", "Lombar"],
   },
   {
-    groupName: "Shoulders",
-    mainMuscles: ["Deltoide (frente)", "Deltoide (lado)", "Deltoide (trás)"],
+    groupName: "Ombros",
+    mainMuscles: [
+      "Deltoide Anterior",
+      "Deltoide Lateral",
+      "Deltoide Posterior",
+    ],
   },
   {
-    groupName: "Arms",
+    groupName: "Braços",
     mainMuscles: ["Bíceps", "Tríceps"],
   },
   {
-    groupName: "Legs",
-    mainMuscles: ["Quadríceps", "Posteriores", "Glúteos", "Panturrilhas"],
+    groupName: "Pernas",
+    mainMuscles: [
+      "Quadríceps",
+      "Posteriores da Coxa",
+      "Glúteos",
+      "Panturrilhas",
+    ],
   },
   {
-    groupName: "Abs",
-    mainMuscles: ["Reto abdominal", "Oblíquos"],
+    groupName: "Abdômen",
+    mainMuscles: ["Reto Abdominal", "Oblíquos"],
   },
 ];
