@@ -1,32 +1,126 @@
+import { HStack, Modal, Text, useTheme, VStack } from "native-base";
 import { FunctionComponent } from "react";
-import { Box, Modal, useDisclose, VStack } from "native-base";
-import { Text } from "react-native";
 import { muscleGroups } from "../data/muscleGroups";
+import { useExercise } from "../hooks/useExercise";
+import { ExerciseModel } from "../models/exercise.model";
+import { Chip } from "./Chip";
 
-export const MuscleModal: FunctionComponent = () => {
-  const { isOpen, onOpen, onClose } = useDisclose();
+interface IMuscleModal {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const MuscleModal: FunctionComponent<IMuscleModal> = ({
+  isOpen,
+  onClose,
+}) => {
+  const theme = useTheme();
+  const exerciseHook = useExercise();
+
+  const checkMuscle = (musclesList: string[], muscleUpdated: string) => {
+    return musclesList.some((muscleItem) => muscleItem === muscleUpdated);
+  };
+
+  const toggleMuscleExercise = (
+    exerciseActive: ExerciseModel,
+    muscleUpdated: string
+  ): string[] => {
+    let musclesList = [...exerciseActive.muscles];
+
+    const hasMuscle = checkMuscle(musclesList, muscleUpdated);
+
+    if (hasMuscle) {
+      musclesList = musclesList.filter(
+        (muscleItem) => muscleItem !== muscleUpdated
+      );
+    } else {
+      musclesList.push(muscleUpdated);
+    }
+
+    return musclesList;
+  };
+
+  const updateMuscleExercise = (muscleUpdated: string): void => {
+    const exerciseUpdated = exerciseHook.exerciseActive;
+
+    if (exerciseUpdated) {
+      let musclesList = toggleMuscleExercise(exerciseUpdated, muscleUpdated);
+
+      const updatedExercise = {
+        ...exerciseUpdated,
+        muscles: musclesList,
+      };
+
+      exerciseHook.setExerciseActive(updatedExercise);
+    }
+  };
+
+  const handlePressMuscleChip = (muscleUpdated: string) => {
+    updateMuscleExercise(muscleUpdated);
+  };
 
   return (
-    <Modal
-      isOpen={true} // isOpen
-      onClose={onClose}
-    >
-      <Modal.Content maxWidth="400px">
-        <Modal.CloseButton />
+    <Modal isOpen={isOpen} onClose={onClose} px={"6"}>
+      <Modal.Content borderRadius={22} width={"full"}>
+        <Modal.CloseButton
+          _icon={{
+            color: "lightBlue.100",
+            size: "xl",
+          }}
+        />
 
-        <Modal.Body>
-          <Text>Principais músculos</Text>
+        <Modal.Body
+          pb={"4"}
+          background={{
+            linearGradient: {
+              colors: [
+                theme.colors.lightBlue[100],
+                theme.colors.lightBlue[600],
+              ],
+              start: [2, 0],
+              end: [0, 1],
+            },
+          }}
+          style={{
+            display: "flex",
+            gap: 16,
+          }}
+        >
+          <Text fontSize={"xl"} color={"lightBlue.100"} mt={"1"}>
+            Principais músculos
+          </Text>
 
           {muscleGroups.map((muscleGroupItem) => {
             return (
-              <VStack key={muscleGroupItem.groupName}>
-                <Text>{muscleGroupItem.groupName}</Text>
+              <VStack key={muscleGroupItem.groupName} space={"0.5"}>
+                <Text color={"lightBlue.100"} fontSize={"sm"}>
+                  {muscleGroupItem.groupName}
+                </Text>
 
-                <Box>
+                <HStack
+                  space={"2"}
+                  flexWrap={"wrap"}
+                  style={{
+                    rowGap: 8,
+                  }}
+                >
                   {muscleGroupItem.mainMuscles.map((mainMuscleItem) => {
-                    return <Text key={mainMuscleItem}>{mainMuscleItem}</Text>;
+                    return (
+                      <Chip
+                        key={mainMuscleItem}
+                        active={
+                          exerciseHook.exerciseActive?.muscles.includes(
+                            mainMuscleItem
+                          )
+                            ? true
+                            : false
+                        }
+                        text={mainMuscleItem}
+                        onPress={() => handlePressMuscleChip(mainMuscleItem)}
+                      />
+                    );
                   })}
-                </Box>
+                </HStack>
               </VStack>
             );
           })}
