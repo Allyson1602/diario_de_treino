@@ -20,9 +20,7 @@ class ExerciseStorage implements IStorageData<ExerciseModel[]> {
 
   async getData() {
     try {
-      const exercisesStringData = await AsyncStorage.getItem(
-        StorageKeys.EXERCISE
-      );
+      const exercisesStringData = await AsyncStorage.getItem(StorageKeys.EXERCISE);
 
       if (exercisesStringData !== null) {
         const exercisesJson: ExerciseModel[] = JSON.parse(exercisesStringData);
@@ -40,13 +38,10 @@ class ExerciseStorage implements IStorageData<ExerciseModel[]> {
     return null;
   }
 
-  private filterUpdatedExercises(
-    exercisesData: ExerciseModel[],
-    exercisesValue: ExerciseModel[]
-  ) {
+  private filterUpdatedExercises(exercisesData: ExerciseModel[], exercisesValue: ExerciseModel[]) {
     return exercisesData.map((exerciseItem) => {
       const exerciseUpdated = exercisesValue.find(
-        (exerciseValue) => exerciseValue.id === exerciseItem.id
+        (exerciseValue) => exerciseValue.id === exerciseItem.id,
       );
 
       if (exerciseUpdated) {
@@ -63,7 +58,7 @@ class ExerciseStorage implements IStorageData<ExerciseModel[]> {
     if (exercisesData) {
       const updateExercisesData: ExerciseModel[] = this.filterUpdatedExercises(
         exercisesData,
-        exercisesValue
+        exercisesValue,
       );
 
       try {

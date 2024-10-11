@@ -4,13 +4,10 @@ import exerciseStorage from "../storages/exercise.storage";
 import { ExerciseModel } from "../models/exercise.model";
 import { IStorageData } from "../interfaces/storageData";
 
-export const useExercise = (): IExerciseContext &
-  IStorageData<ExerciseModel[]> => {
+export const useExercise = (): IExerciseContext & IStorageData<ExerciseModel[]> => {
   const exerciseContext = useContext(ExerciseContext);
 
-  const overwriteSetExerciseActive = (
-    newExercise: ExerciseModel | undefined
-  ) => {
+  const overwriteSetExerciseActive = (newExercise: ExerciseModel | undefined) => {
     exerciseContext.setExerciseActive(newExercise);
 
     if (newExercise) {

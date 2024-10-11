@@ -1,12 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { HStack, useTheme } from "native-base";
 import { FunctionComponent } from "react";
-import {
-  cancelAnimation,
-  SharedValue,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { cancelAnimation, SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
 interface ExerciseNavigationProps {
@@ -16,9 +11,7 @@ interface ExerciseNavigationProps {
   onPressRight: () => void;
 }
 
-export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (
-  props
-) => {
+export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (props) => {
   const theme = useTheme();
   const scaleLeft = useSharedValue(1);
   const scaleRight = useSharedValue(1);
@@ -50,13 +43,7 @@ export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (
         rounded={"full"}
         isDisabled={props.leftIconDisabled}
         style={{ transform: [{ scale: scaleLeft }] }}
-        icon={
-          <Feather
-            name="corner-up-left"
-            size={50}
-            color={theme.colors.primary[500]}
-          />
-        }
+        icon={<Feather name="corner-up-left" size={50} color={theme.colors.primary[500]} />}
         _pressed={{
           backgroundColor: "transparent",
         }}
@@ -67,13 +54,7 @@ export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (
         rounded={"full"}
         isDisabled={props.rightIconDisabled}
         style={{ transform: [{ scale: scaleRight }] }}
-        icon={
-          <Feather
-            name="corner-up-right"
-            size={50}
-            color={theme.colors.primary[500]}
-          />
-        }
+        icon={<Feather name="corner-up-right" size={50} color={theme.colors.primary[500]} />}
         _pressed={{
           backgroundColor: "transparent",
         }}

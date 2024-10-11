@@ -53,9 +53,7 @@ export const Home: FunctionComponent = () => {
                 <HStack justifyContent={"space-between"} space={"4"}>
                   <Card.Title text="Poder Total" />
 
-                  <Card.LastTrainingDate
-                    lastTraining={moment("01/01/2024", "DD/MM/YYYY")}
-                  />
+                  <Card.LastTrainingDate lastTraining={moment("01/01/2024", "DD/MM/YYYY")} />
                 </HStack>
 
                 <Card.MuscleChips muscleNames={["tríceps", "peito", "ombro"]} />
@@ -104,12 +102,7 @@ export const Home: FunctionComponent = () => {
         >
           <VStack space={"8"}>
             <VStack space={"2"} px={"2"}>
-              <Text
-                color={"white"}
-                fontWeight={"bold"}
-                textAlign={"center"}
-                fontSize={"lg"}
-              >
+              <Text color={"white"} fontWeight={"bold"} textAlign={"center"} fontSize={"lg"}>
                 Com seu apoio, podemos continuar inovando!
               </Text>
               <Text color={"white"} textAlign={"center"} fontSize={"md"}>
@@ -122,12 +115,7 @@ export const Home: FunctionComponent = () => {
                 Doe qualquer valor via Pix
               </Text>
               <Box bgColor={"white"} padding={"3"} borderRadius={"xl"}>
-                <Image
-                  source={QRCodePixImage}
-                  width={"150"}
-                  height={"150"}
-                  alt="qrcode pix"
-                />
+                <Image source={QRCodePixImage} width={"150"} height={"150"} alt="qrcode pix" />
               </Box>
               <Link
                 href="https://nubank.com.br/cobrar/1etqjh/66fe9de3-e156-4c2e-b2ba-7e5565e5a69b"

@@ -10,10 +10,7 @@ interface IMuscleModal {
   onClose: () => void;
 }
 
-export const MuscleModal: FunctionComponent<IMuscleModal> = ({
-  isOpen,
-  onClose,
-}) => {
+export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }) => {
   const theme = useTheme();
   const exerciseHook = useExercise();
 
@@ -21,18 +18,13 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({
     return musclesList.some((muscleItem) => muscleItem === muscleUpdated);
   };
 
-  const toggleMuscleExercise = (
-    exerciseActive: ExerciseModel,
-    muscleUpdated: string
-  ): string[] => {
+  const toggleMuscleExercise = (exerciseActive: ExerciseModel, muscleUpdated: string): string[] => {
     let musclesList = [...exerciseActive.muscles];
 
     const hasMuscle = checkMuscle(musclesList, muscleUpdated);
 
     if (hasMuscle) {
-      musclesList = musclesList.filter(
-        (muscleItem) => muscleItem !== muscleUpdated
-      );
+      musclesList = musclesList.filter((muscleItem) => muscleItem !== muscleUpdated);
     } else {
       musclesList.push(muscleUpdated);
     }
@@ -73,10 +65,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({
           pb={"4"}
           background={{
             linearGradient: {
-              colors: [
-                theme.colors.lightBlue[100],
-                theme.colors.lightBlue[600],
-              ],
+              colors: [theme.colors.lightBlue[100], theme.colors.lightBlue[600]],
               start: [2, 0],
               end: [0, 1],
             },
@@ -109,9 +98,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({
                       <Chip
                         key={mainMuscleItem}
                         active={
-                          exerciseHook.exerciseActive?.muscles.includes(
-                            mainMuscleItem
-                          )
+                          exerciseHook.exerciseActive?.muscles.includes(mainMuscleItem)
                             ? true
                             : false
                         }

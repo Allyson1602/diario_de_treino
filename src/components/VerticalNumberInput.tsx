@@ -15,9 +15,7 @@ interface VerticalNumberInputProps {
   value?: number | null;
 }
 
-export const VerticalNumberInput: FunctionComponent<
-  VerticalNumberInputProps
-> = (props) => {
+export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = (props) => {
   const defineMaxNumberValue = (numberValue: number | null) => {
     if (!numberValue) return null;
 

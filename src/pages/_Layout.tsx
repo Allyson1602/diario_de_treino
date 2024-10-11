@@ -19,9 +19,7 @@ const Stack = createNativeStackNavigator();
 
 export const Layout: FunctionComponent = () => {
   const [appIsReady, setAppIsReady] = useState(false);
-  const [exerciseActive, setExerciseActive] = useState<
-    ExerciseModel | undefined
-  >(undefined);
+  const [exerciseActive, setExerciseActive] = useState<ExerciseModel | undefined>(undefined);
 
   useEffect(() => {
     async function prepare() {
