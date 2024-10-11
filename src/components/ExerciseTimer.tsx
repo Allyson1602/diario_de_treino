@@ -5,11 +5,7 @@ import { Center, Input, useTheme, VStack } from "native-base";
 import { FunctionComponent, useCallback, useState } from "react";
 import { Keyboard, ViewStyle } from "react-native";
 import { TextInputMask } from "react-native-masked-text";
-import {
-  SharedValue,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
 const MIN_TIMER_VALUE = "0:00";
@@ -30,9 +26,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
 
   const [toggleTimer, setToggleTimer] = useState(false);
   const [timerValue, setTimerValue] = useState(props.timerValue);
-  const [timerInterval, setTimerInterval] = useState<
-    NodeJS.Timeout | undefined
-  >();
+  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | undefined>();
 
   const defineAnimationOnPress = (scale: SharedValue<number>) => {
     scale.value = withTiming(0.9, { duration: 100 }, () => {
@@ -115,13 +109,13 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
 
         props.onTimerEnd?.();
       }
-    }, [timerValue])
+    }, [timerValue]),
   );
 
   useFocusEffect(
     useCallback(() => {
       setTimerValue(props.timerValue);
-    }, [props.timerValue])
+    }, [props.timerValue]),
   );
 
   return (

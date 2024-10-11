@@ -7,10 +7,7 @@ interface ChipProps {
   onPress: () => void;
 }
 
-export const Chip: FunctionComponent<ChipProps> = ({
-  active = false,
-  ...props
-}) => {
+export const Chip: FunctionComponent<ChipProps> = ({ active = false, ...props }) => {
   const handlePressChip = () => {
     props.onPress();
   };

@@ -1,19 +1,13 @@
 import { Pressable as PressableNB } from "native-base";
 import { FunctionComponent, PropsWithChildren } from "react";
 import { CustomAnimated } from "../ui/CustomAnimated";
-import {
-  cancelAnimation,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { cancelAnimation, useSharedValue, withTiming } from "react-native-reanimated";
 
 interface IContainerProps {
   onPress: () => void;
 }
 
-export const Container: FunctionComponent<
-  PropsWithChildren<IContainerProps>
-> = (props) => {
+export const Container: FunctionComponent<PropsWithChildren<IContainerProps>> = (props) => {
   const scale = useSharedValue(1);
 
   const defineAnimationOnPress = () => {

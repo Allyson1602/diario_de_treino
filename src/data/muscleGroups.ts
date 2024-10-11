@@ -14,11 +14,7 @@ export const muscleGroups: IMuscleGroups[] = [
   },
   {
     groupName: "Ombros",
-    mainMuscles: [
-      "Deltoide Anterior",
-      "Deltoide Lateral",
-      "Deltoide Posterior",
-    ],
+    mainMuscles: ["Deltoide Anterior", "Deltoide Lateral", "Deltoide Posterior"],
   },
   {
     groupName: "Braços",
@@ -26,12 +22,7 @@ export const muscleGroups: IMuscleGroups[] = [
   },
   {
     groupName: "Pernas",
-    mainMuscles: [
-      "Quadríceps",
-      "Posteriores da Coxa",
-      "Glúteos",
-      "Panturrilhas",
-    ],
+    mainMuscles: ["Quadríceps", "Posteriores da Coxa", "Glúteos", "Panturrilhas"],
   },
   {
     groupName: "Abdômen",

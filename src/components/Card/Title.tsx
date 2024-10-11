@@ -7,12 +7,7 @@ interface ITitleProps {
 
 export const Title: FunctionComponent<ITitleProps> = (props) => {
   return (
-    <Text
-      fontSize={"md"}
-      fontWeight={"medium"}
-      color={"text.700"}
-      numberOfLines={1}
-    >
+    <Text fontSize={"md"} fontWeight={"medium"} color={"text.700"} numberOfLines={1}>
       {props.text}
     </Text>
   );

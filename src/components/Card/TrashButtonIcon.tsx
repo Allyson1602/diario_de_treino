@@ -9,9 +9,7 @@ interface ITrashButtonIconProps {
 
 const AnimatedIconButton = Animated.createAnimatedComponent(IconButton);
 
-export const TrashButtonIcon: FunctionComponent<ITrashButtonIconProps> = (
-  props
-) => {
+export const TrashButtonIcon: FunctionComponent<ITrashButtonIconProps> = (props) => {
   if (!props.onRemove) return <></>;
 
   const scale = useSharedValue(1);

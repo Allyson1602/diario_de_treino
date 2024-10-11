@@ -55,7 +55,7 @@ export const MotivationPhrases: FunctionComponent = () => {
   useFocusEffect(
     useCallback(() => {
       defineRandomPhrase();
-    }, [])
+    }, []),
   );
 
   return (
@@ -70,17 +70,8 @@ export const MotivationPhrases: FunctionComponent = () => {
         {randomPhrase}
       </Text>
 
-      <CustomAnimated.Box
-        position={"absolute"}
-        top={"-24"}
-        style={animatedStyle}
-      >
-        <Icon
-          as={Feather}
-          name="refresh-cw"
-          size={"4xl"}
-          color="primary.500:alpha.40"
-        />
+      <CustomAnimated.Box position={"absolute"} top={"-24"} style={animatedStyle}>
+        <Icon as={Feather} name="refresh-cw" size={"4xl"} color="primary.500:alpha.40" />
       </CustomAnimated.Box>
     </CustomAnimated.Pressable>
   );
