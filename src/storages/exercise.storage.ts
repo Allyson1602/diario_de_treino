@@ -80,4 +80,4 @@ class ExerciseStorage implements IStorageData<ExerciseModel[]> {
   }
 }
 
-export default new ExerciseStorage();
+export default new ExerciseStorage() as IStorageData<ExerciseModel[]>;
