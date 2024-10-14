@@ -1,14 +1,20 @@
-import { useContext } from "react";
-import { ExerciseContext, IExerciseContext } from "../contexts/exerciseContext";
-import exerciseStorage from "../storages/exercise.storage";
-import { ExerciseModel } from "../models/exercise.model";
 import { IStorageData } from "../interfaces/storageData";
+import { ExerciseModel } from "../models/exercise.model";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { setExercise } from "../redux/slices/exerciseSlice";
+import exerciseStorage from "../storages/exercise.storage";
 
-export const useExercise = (): IExerciseContext & IStorageData<ExerciseModel[]> => {
-  const exerciseContext = useContext(ExerciseContext);
+interface IUseExercise extends IStorageData<ExerciseModel[]> {
+  exerciseActive: ExerciseModel | null;
+  setExerciseActive: (newExercise: ExerciseModel | null) => void;
+}
 
-  const overwriteSetExerciseActive = (newExercise: ExerciseModel | undefined) => {
-    exerciseContext.setExerciseActive(newExercise);
+export const useExercise = (): IUseExercise => {
+  const exerciseData = useAppSelector((state) => state.exercise.value);
+  const dispatch = useAppDispatch();
+
+  const overwriteSetExerciseActive = (newExercise: ExerciseModel | null) => {
+    dispatch(setExercise(newExercise));
 
     if (newExercise) {
       exerciseStorage.updateData([newExercise]);
@@ -16,8 +22,8 @@ export const useExercise = (): IExerciseContext & IStorageData<ExerciseModel[]> 
   };
 
   return {
-    ...exerciseContext,
     ...exerciseStorage,
+    exerciseActive: exerciseData,
     setExerciseActive: overwriteSetExerciseActive,
   };
 };

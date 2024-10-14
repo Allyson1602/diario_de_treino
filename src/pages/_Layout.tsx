@@ -5,11 +5,12 @@ import { StatusBar } from "expo-status-bar";
 import { NativeBaseProvider } from "native-base";
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
+import { Provider } from "react-redux";
 import { fetchPoppinsFonts } from "../configs/fonts/poppins";
 import { nativeBaseConfig, theme } from "../configs/themes/theme";
 import { toastConfig } from "../configs/toast";
-import { ExerciseContext } from "../contexts/exerciseContext";
 import { ExerciseModel } from "../models/exercise.model";
+import { store } from "../redux/store";
 import { Home } from "./Home";
 import { Training } from "./Training";
 import { Workout } from "./Workout";
@@ -50,12 +51,7 @@ export const Layout: FunctionComponent = () => {
       <StatusBar style="auto" animated />
 
       <NativeBaseProvider theme={theme} config={nativeBaseConfig}>
-        <ExerciseContext.Provider
-          value={{
-            exerciseActive,
-            setExerciseActive,
-          }}
-        >
+        <Provider store={store}>
           <NavigationContainer onReady={onLayoutRootView}>
             <Stack.Navigator initialRouteName="Home">
               <Stack.Screen
@@ -69,7 +65,7 @@ export const Layout: FunctionComponent = () => {
               <Stack.Screen name="Workout" component={Workout} />
             </Stack.Navigator>
           </NavigationContainer>
-        </ExerciseContext.Provider>
+        </Provider>
       </NativeBaseProvider>
 
       <Toast config={toastConfig} topOffset={16} />
