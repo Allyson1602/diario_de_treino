@@ -5,6 +5,7 @@ import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { HStack, Input, Pressable, Text, useTheme } from "native-base";
 import { FunctionComponent, useCallback, useRef, useState } from "react";
 import { useTraining } from "../hooks/useTraining";
+import { CustomAnimated } from "./ui/CustomAnimated";
 
 const DEFAULT_TRAINING_NAME = "Nome do treino";
 
@@ -17,6 +18,10 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
   const [trainingNameValue, setTrainingNameValue] = useState(
     trainingHook.trainingActive?.name || DEFAULT_TRAINING_NAME,
   );
+
+  const handleGoBack = () => {
+    props.navigation.goBack();
+  };
 
   const handlePressText = () => {
     setIsActive(true);
@@ -52,7 +57,11 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
 
   return (
     <HStack safeArea p={"4"} alignItems={"center"}>
-      <Ionicons name="chevron-back" size={32} color="black" />
+      <CustomAnimated.IconButton
+        icon={<Ionicons name="chevron-back" size={32} color="black" />}
+        onPress={handleGoBack}
+        rounded={"full"}
+      />
 
       {isActive ? (
         <Input
