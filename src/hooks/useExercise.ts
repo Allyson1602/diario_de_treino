@@ -22,7 +22,9 @@ export const useExercise = (): IUseExercise => {
   };
 
   return {
-    ...exerciseStorage,
+    getData: exerciseStorage.getData,
+    setData: exerciseStorage.setData,
+    updateData: exerciseStorage.updateData,
     exerciseActive: exerciseData,
     setExerciseActive: overwriteSetExerciseActive,
   };
