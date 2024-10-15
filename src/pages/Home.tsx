@@ -21,7 +21,7 @@ import { MotivationPhrases } from "../components/MotivationalPhrases";
 import { getAllMuscleTraining } from "../helpers/getAllMuscleTraining";
 import { useTraining } from "../hooks/useTraining";
 import { TrainingModel } from "../models/training.model";
-import { RootStackParamList } from "./_Layout";
+import { RootStackParamList } from "../navigation";
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, "Home", "RootStack">;
 
