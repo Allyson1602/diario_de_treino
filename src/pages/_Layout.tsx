@@ -1,4 +1,4 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, ParamListBase } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -9,18 +9,22 @@ import { Provider } from "react-redux";
 import { fetchPoppinsFonts } from "../configs/fonts/poppins";
 import { nativeBaseConfig, theme } from "../configs/themes/theme";
 import { toastConfig } from "../configs/toast";
-import { ExerciseModel } from "../models/exercise.model";
 import { store } from "../redux/store";
 import { Home } from "./Home";
 import { Training } from "./Training";
 import { Workout } from "./Workout";
 
+export interface RootStackParamList extends ParamListBase {
+  Home: undefined;
+  Training: undefined;
+  Workout: undefined;
+}
+
 SplashScreen.preventAutoHideAsync();
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const Layout: FunctionComponent = () => {
   const [appIsReady, setAppIsReady] = useState(false);
-  const [exerciseActive, setExerciseActive] = useState<ExerciseModel | undefined>(undefined);
 
   useEffect(() => {
     async function prepare() {

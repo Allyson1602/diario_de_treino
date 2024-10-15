@@ -1,3 +1,5 @@
+import { useFocusEffect } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import moment from "moment";
 import {
   Actionsheet,
@@ -12,14 +14,44 @@ import {
   useTheme,
   VStack,
 } from "native-base";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useCallback, useState } from "react";
 import QRCodePixImage from "../../assets/images/app/qrcode_pix.png";
 import { Card } from "../components/Card/index";
 import { MotivationPhrases } from "../components/MotivationalPhrases";
+import { getAllMuscleTraining } from "../helpers/getAllMuscleTraining";
+import { useTraining } from "../hooks/useTraining";
+import { TrainingModel } from "../models/training.model";
+import { RootStackParamList } from "./_Layout";
 
-export const Home: FunctionComponent = () => {
+type HomeProps = NativeStackScreenProps<RootStackParamList, "Home", "RootStack">;
+
+export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   const theme = useTheme();
+  const trainingHook = useTraining();
   const { isOpen, onClose, onOpen } = useDisclose();
+
+  const [trainingsData, setTrainingsData] = useState<TrainingModel[]>([]);
+
+  const listTrainingsByStorage = async () => {
+    const trainingsStorage = await trainingHook.getData();
+
+    setTrainingsData(trainingsStorage!);
+  };
+
+  const handlePressNewWorkout = () => {
+    navigation.navigate("Workout");
+  };
+
+  const handlePressTrainingItem = (trainingItem: TrainingModel) => {
+    trainingHook.setTrainingActive(trainingItem);
+    navigation.navigate("Training");
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      listTrainingsByStorage();
+    }, []),
+  );
 
   return (
     <>
@@ -35,7 +67,7 @@ export const Home: FunctionComponent = () => {
           },
         }}
       >
-        <VStack flex={1}>
+        <VStack flex={1} mb={"4"}>
           <Text color={"text.500"} fontSize={"sm"} px={"6"}>
             Seus treinos montados
           </Text>
@@ -48,17 +80,24 @@ export const Home: FunctionComponent = () => {
             }}
             showsVerticalScrollIndicator={false}
           >
-            <Card.Container onPress={() => {}}>
-              <VStack flexGrow={1} space={"4"}>
-                <HStack justifyContent={"space-between"} space={"4"}>
-                  <Card.Title text="Poder Total" />
+            {trainingsData.map((trainingItem) => (
+              <Card.Container
+                key={trainingItem.id}
+                onPress={() => handlePressTrainingItem(trainingItem)}
+              >
+                <VStack flexGrow={1} space={"4"}>
+                  <HStack justifyContent={"space-between"} space={"4"}>
+                    <Card.Title text={trainingItem.name} />
 
-                  <Card.LastTrainingDate lastTraining={moment("01/01/2024", "DD/MM/YYYY")} />
-                </HStack>
+                    <Card.LastTrainingDate
+                      lastTraining={moment(trainingItem.lastTraining, "MM/DD/YYYY")}
+                    />
+                  </HStack>
 
-                <Card.MuscleChips muscleNames={["tríceps", "peito", "ombro"]} />
-              </VStack>
-            </Card.Container>
+                  <Card.MuscleChips muscleNames={getAllMuscleTraining(trainingItem.exercises)} />
+                </VStack>
+              </Card.Container>
+            ))}
           </ScrollView>
         </VStack>
 
@@ -73,6 +112,7 @@ export const Home: FunctionComponent = () => {
                 fontWeight: "medium",
               }}
               borderColor={"rose.600"}
+              onPress={handlePressNewWorkout}
             >
               Novo treino
             </Button>
