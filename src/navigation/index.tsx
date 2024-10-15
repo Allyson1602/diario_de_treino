@@ -1,11 +1,12 @@
 import { NavigationContainer, ParamListBase } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import * as SplashScreen from "expo-splash-screen";
+import { FunctionComponent, useCallback, useEffect, useState } from "react";
+import { HeaderTraining } from "../components/HeaderTraining";
+import { fetchPoppinsFonts } from "../configs/fonts/poppins";
 import { Home } from "../pages/Home";
 import { Training } from "../pages/Training";
 import { Workout } from "../pages/Workout";
-import { fetchPoppinsFonts } from "../configs/fonts/poppins";
 
 export interface RootStackParamList extends ParamListBase {
   Home: undefined;
@@ -53,7 +54,14 @@ export const Navigation: FunctionComponent = () => {
             headerShown: false,
           }}
         />
-        <Stack.Screen name="Training" component={Training} />
+        <Stack.Screen
+          name="Training"
+          component={Training}
+          options={{
+            header: HeaderTraining,
+            headerTransparent: true,
+          }}
+        />
         <Stack.Screen name="Workout" component={Workout} />
       </Stack.Navigator>
     </NavigationContainer>
