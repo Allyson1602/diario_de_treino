@@ -4,15 +4,19 @@ import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { HStack, Input, Pressable, Text, useTheme } from "native-base";
 import { FunctionComponent, useCallback, useRef, useState } from "react";
+import { useTraining } from "../hooks/useTraining";
 
-const DEFAULT_WORKOUT_NAME = "Nome do exercício";
+const DEFAULT_TRAINING_NAME = "Nome do treino";
 
 export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props) => {
-  const workoutNameInputRef = useRef<HTMLInputElement>(null);
+  const trainingNameInputRef = useRef<HTMLInputElement>(null);
   const theme = useTheme();
+  const trainingHook = useTraining();
 
   const [isActive, setIsActive] = useState(false);
-  const [workoutNameValue, setWorkoutNameValue] = useState(DEFAULT_WORKOUT_NAME);
+  const [trainingNameValue, setTrainingNameValue] = useState(
+    trainingHook.trainingActive?.name || DEFAULT_TRAINING_NAME,
+  );
 
   const handlePressText = () => {
     setIsActive(true);
@@ -23,13 +27,25 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
   };
 
   const handleChangeText = (text: string) => {
-    setWorkoutNameValue(text);
+    setTrainingNameValue(text);
+
+    trainingHook.setTrainingActive({
+      ...trainingHook.trainingActive!,
+      name: text,
+    });
+
+    trainingHook.updateData([
+      {
+        ...trainingHook.trainingActive!,
+        name: text,
+      },
+    ]);
   };
 
   useFocusEffect(
     useCallback(() => {
       if (isActive) {
-        workoutNameInputRef.current?.focus();
+        trainingNameInputRef.current?.focus();
       }
     }, [isActive]),
   );
@@ -41,7 +57,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
       {isActive ? (
         <Input
           selectTextOnFocus
-          value={workoutNameValue}
+          value={trainingNameValue}
           flex={"1"}
           alignSelf={"center"}
           textAlign={"center"}
@@ -51,7 +67,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
           selectionColor={theme.colors.blue[400]}
           onBlur={handleBlurInput}
           onChangeText={handleChangeText}
-          ref={workoutNameInputRef}
+          ref={trainingNameInputRef}
           InputRightElement={
             <Feather name="edit-3" size={24} color="black" style={{ opacity: 0 }} />
           }
@@ -65,7 +81,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
         <Pressable flex={"1"} onPress={handlePressText}>
           <HStack space={"1"} flex={"1"} justifyContent={"center"} alignItems={"center"}>
             <Text textAlign={"center"} fontSize={"lg"}>
-              {workoutNameValue}
+              {trainingNameValue}
             </Text>
             <Feather name="edit-3" size={24} color="black" />
           </HStack>
