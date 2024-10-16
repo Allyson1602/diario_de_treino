@@ -33,7 +33,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   const [trainingsData, setTrainingsData] = useState<TrainingModel[]>([]);
 
   const listTrainingsByStorage = async () => {
-    const trainingsStorage = await trainingHook.getData();
+    const trainingsStorage = (await trainingHook.getData()) || [];
 
     setTrainingsData(trainingsStorage!);
   };

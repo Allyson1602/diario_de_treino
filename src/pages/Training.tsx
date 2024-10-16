@@ -1,7 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Button, Center, HStack, ScrollView, Text, useTheme, VStack } from "native-base";
+import { Center, HStack, ScrollView, Text, useTheme, VStack } from "native-base";
 import { FunctionComponent } from "react";
+import { cancelAnimation, SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { Card } from "../components/Card";
 import { CustomAnimated } from "../components/ui/CustomAnimated";
 import { useExercise } from "../hooks/useExercise";
@@ -15,13 +16,28 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
   const theme = useTheme();
   const exerciseHook = useExercise();
   const trainingHook = useTraining();
+  const scaleStartWorkout = useSharedValue(1);
+  const scaleAddWorkout = useSharedValue(1);
+
+  const defineAnimationOnPress = (scale: SharedValue<number>) => {
+    cancelAnimation(scale);
+
+    scale.value = withTiming(0.9, { duration: 200 }, () => {
+      scale.value = withTiming(1, { duration: 200 });
+    });
+  };
 
   const handlePressNewWorkout = () => {
     navigation.navigate("Workout");
+    defineAnimationOnPress(scaleAddWorkout);
   };
 
   const handleRemoveExercise = () => {
     console.log("remove");
+  };
+
+  const handlePressStartWorkout = () => {
+    defineAnimationOnPress(scaleStartWorkout);
   };
 
   const handlePressExerciseItem = (exerciseItem: ExerciseModel) => {
@@ -55,6 +71,8 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
             rounded={"full"}
             p={"0.5"}
             onPress={handlePressNewWorkout}
+            style={{ transform: [{ scale: scaleAddWorkout }] }}
+            variant={"unstyled"}
           />
         </HStack>
 
@@ -86,16 +104,18 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
       </VStack>
 
       <Center>
-        <Button
+        <CustomAnimated.Button
           rounded={"full"}
           size={"lg"}
           px={"8"}
+          style={{ transform: [{ scale: scaleStartWorkout }] }}
           _text={{
             fontSize: "3xl",
           }}
+          onPress={handlePressStartWorkout}
         >
           Iniciar
-        </Button>
+        </CustomAnimated.Button>
       </Center>
     </VStack>
   );
