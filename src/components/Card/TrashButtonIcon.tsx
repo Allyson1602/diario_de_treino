@@ -51,7 +51,7 @@ export const TrashButtonIcon: FunctionComponent<ITrashButtonIconProps> = (props)
       isOpen={isToolTipOpen}
       placement="bottom left"
       right={"2"}
-      top={"-36"}
+      top={"-20"}
       bgColor={"danger.600"}
     >
       <AnimatedIconButton

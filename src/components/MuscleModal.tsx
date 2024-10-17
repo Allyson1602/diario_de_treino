@@ -1,7 +1,7 @@
 import { HStack, Modal, Text, useTheme, VStack } from "native-base";
 import { FunctionComponent } from "react";
 import { muscleGroups } from "../data/muscleGroups";
-import { useExercise } from "../hooks/useExercise";
+import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
 import { Chip } from "./Chip";
 
@@ -12,7 +12,7 @@ interface IMuscleModal {
 
 export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }) => {
   const theme = useTheme();
-  const exerciseHook = useExercise();
+  const trainingHook = useTraining();
 
   const checkMuscle = (musclesList: string[], muscleUpdated: string) => {
     return musclesList.some((muscleItem) => muscleItem === muscleUpdated);
@@ -33,7 +33,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
   };
 
   const updateMuscleExercise = (muscleUpdated: string): void => {
-    const exerciseUpdated = exerciseHook.exerciseActive;
+    const exerciseUpdated = trainingHook.exerciseActive;
 
     if (exerciseUpdated) {
       let musclesList = toggleMuscleExercise(exerciseUpdated, muscleUpdated);
@@ -43,7 +43,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
         muscles: musclesList,
       };
 
-      exerciseHook.setExerciseActive(updatedExercise);
+      trainingHook.setExerciseActive(updatedExercise);
     }
   };
 
@@ -98,7 +98,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
                       <Chip
                         key={mainMuscleItem}
                         active={
-                          exerciseHook.exerciseActive?.muscles.includes(mainMuscleItem)
+                          trainingHook.exerciseActive?.muscles.includes(mainMuscleItem)
                             ? true
                             : false
                         }

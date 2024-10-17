@@ -1,10 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { IStorageData } from "../interfaces/storageData";
-import { StorageKeys } from "./_storageKeys";
 import Toast from "react-native-toast-message";
+import { IStorageData } from "../interfaces/storageData";
 import { TrainingModel } from "../models/training.model";
+import { StorageKeys } from "./_storageKeys";
 
-class TrainingStorage implements IStorageData<TrainingModel[]> {
+class TrainingStorage implements IStorageData<TrainingModel> {
   async setData(trainingsValue: TrainingModel[]): Promise<void> {
     try {
       const trainingsJson = JSON.stringify(trainingsValue);
@@ -22,7 +22,7 @@ class TrainingStorage implements IStorageData<TrainingModel[]> {
     try {
       const trainingsStringData = await AsyncStorage.getItem(StorageKeys.TRAINING);
 
-      if (trainingsStringData !== null) {
+      if (trainingsStringData) {
         const trainingsJson: TrainingModel[] = JSON.parse(trainingsStringData);
 
         return trainingsJson;
@@ -35,30 +35,26 @@ class TrainingStorage implements IStorageData<TrainingModel[]> {
       });
     }
 
-    return null;
+    return [];
   }
 
-  private filterUpdatedTrainings(trainingsData: TrainingModel[], trainingsValue: TrainingModel[]) {
+  private filterUpdatedTrainings(trainingsData: TrainingModel[], trainingValue: TrainingModel) {
     return trainingsData.map((trainingItem) => {
-      const trainingUpdated = trainingsValue.find(
-        (trainingValue) => trainingValue.id === trainingItem.id,
-      );
-
-      if (trainingUpdated) {
-        return trainingUpdated;
+      if (trainingItem.id === trainingValue.id) {
+        return trainingValue;
       }
 
       return trainingItem;
     });
   }
 
-  async updateData(trainingsValue: TrainingModel[]) {
+  async updateData(trainingValue: TrainingModel) {
     const trainingsData = await this.getData();
 
     if (trainingsData) {
       const updateTrainingsData: TrainingModel[] = this.filterUpdatedTrainings(
         trainingsData,
-        trainingsValue,
+        trainingValue,
       );
 
       try {
@@ -73,6 +69,27 @@ class TrainingStorage implements IStorageData<TrainingModel[]> {
       }
     }
   }
+
+  async removeData(value: TrainingModel): Promise<boolean> {
+    const trainingData = await this.getData();
+
+    if (trainingData && trainingData.length > 0) {
+      const trainingFiltered = trainingData.filter((item) => item.id !== value.id);
+
+      const trainingJson = JSON.stringify(trainingFiltered);
+      await AsyncStorage.setItem(StorageKeys.TRAINING, trainingJson);
+
+      return true;
+    }
+
+    Toast.show({
+      type: "error",
+      text1: "Treino 💪",
+      text2: "Opa! Não conseguimos remover o treino.",
+    });
+
+    return false;
+  }
 }
 
-export default new TrainingStorage() as IStorageData<TrainingModel[]>;
+export default new TrainingStorage() as IStorageData<TrainingModel>;

@@ -29,7 +29,7 @@ export const motivationPhrases: string[] = [
   "Acredite em você, treine por você.",
   "Eu e a musculação temos um pacto: eu me esforço e ela me dá resultados.",
   "Acredite em você e siga com determinação.",
-  "Se esforce para ser quem você sonhar ser.",
+  "Se esforce para ser quem você sonha em ser.",
   "E quando faltar motivação, treine assim mesmo. No final, terá a satisfação.",
   "A persistência realiza o impossível.",
   "Limites são como borrachas de apagar: feitos para serem ultrapassados.",

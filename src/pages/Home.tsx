@@ -21,7 +21,7 @@ import { MotivationPhrases } from "../components/MotivationalPhrases";
 import { getAllMuscleTraining } from "../helpers/getAllMuscleTraining";
 import { useTraining } from "../hooks/useTraining";
 import { TrainingModel } from "../models/training.model";
-import { RootStackParamList } from "./_Layout";
+import { RootStackParamList } from "../navigation";
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, "Home", "RootStack">;
 
@@ -33,9 +33,9 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   const [trainingsData, setTrainingsData] = useState<TrainingModel[]>([]);
 
   const listTrainingsByStorage = async () => {
-    const trainingsStorage = await trainingHook.getData();
+    const trainingsStorage = (await trainingHook.getData()) || [];
 
-    setTrainingsData(trainingsStorage!);
+    setTrainingsData([...trainingsStorage]);
   };
 
   const handlePressNewWorkout = () => {
@@ -68,37 +68,49 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
         }}
       >
         <VStack flex={1} mb={"4"}>
-          <Text color={"text.500"} fontSize={"sm"} px={"6"}>
-            Seus treinos montados
+          <Text color={"text.500"} fontWeight={"medium"} px={"6"}>
+            Treinos
           </Text>
 
-          <ScrollView
-            contentContainerStyle={{
-              gap: 8,
-              paddingVertical: 8,
-              paddingHorizontal: 24,
-            }}
-            showsVerticalScrollIndicator={false}
-          >
-            {trainingsData.map((trainingItem) => (
-              <Card.Container
-                key={trainingItem.id}
-                onPress={() => handlePressTrainingItem(trainingItem)}
-              >
-                <VStack flexGrow={1} space={"4"}>
-                  <HStack justifyContent={"space-between"} space={"4"}>
-                    <Card.Title text={trainingItem.name} />
+          {trainingsData.length > 0 ? (
+            <ScrollView
+              contentContainerStyle={{
+                gap: 8,
+                paddingVertical: 8,
+                paddingHorizontal: 24,
+              }}
+              showsVerticalScrollIndicator={false}
+            >
+              {trainingsData.map((trainingItem) => (
+                <Card.Container
+                  key={trainingItem.id}
+                  onPress={() => handlePressTrainingItem(trainingItem)}
+                >
+                  <VStack flexGrow={1} space={"4"}>
+                    <HStack justifyContent={"space-between"} space={"4"}>
+                      <Card.Title text={trainingItem.name} />
 
-                    <Card.LastTrainingDate
-                      lastTraining={moment(trainingItem.lastTraining, "MM/DD/YYYY")}
-                    />
-                  </HStack>
+                      <Card.LastTrainingDate
+                        lastTraining={moment(trainingItem.lastTraining, "MM/DD/YYYY")}
+                      />
+                    </HStack>
 
-                  <Card.MuscleChips muscleNames={getAllMuscleTraining(trainingItem.exercises)} />
-                </VStack>
-              </Card.Container>
-            ))}
-          </ScrollView>
+                    <Card.MuscleChips muscleNames={getAllMuscleTraining(trainingItem.exercises)} />
+                  </VStack>
+                </Card.Container>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text
+              textAlign={"center"}
+              pt={"6"}
+              fontWeight={"light"}
+              fontSize={"md"}
+              color={"text.500"}
+            >
+              Para iniciar, clique em <Text fontWeight={"black"}>Novo Treino</Text>
+            </Text>
+          )}
         </VStack>
 
         <VStack space={"5"}>
