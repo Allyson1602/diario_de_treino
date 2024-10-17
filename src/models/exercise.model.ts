@@ -1,10 +1,9 @@
-import { MuscleModel } from "./muscle.model";
-
 export interface ExerciseModel {
   id: number;
+  name: string;
   anotation?: string;
   repetitions?: number;
   weight?: number;
   timer?: string;
-  muscles?: MuscleModel[];
+  muscles: string[];
 }

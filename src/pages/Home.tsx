@@ -1,3 +1,5 @@
+import { useFocusEffect } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import moment from "moment";
 import {
   Actionsheet,
@@ -12,14 +14,44 @@ import {
   useTheme,
   VStack,
 } from "native-base";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useCallback, useState } from "react";
 import QRCodePixImage from "../../assets/images/app/qrcode_pix.png";
 import { Card } from "../components/Card/index";
 import { MotivationPhrases } from "../components/MotivationalPhrases";
+import { getAllMuscleTraining } from "../helpers/getAllMuscleTraining";
+import { useTraining } from "../hooks/useTraining";
+import { TrainingModel } from "../models/training.model";
+import { RootStackParamList } from "../navigation";
 
-export const Home: FunctionComponent = () => {
+type HomeProps = NativeStackScreenProps<RootStackParamList, "Home", "RootStack">;
+
+export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   const theme = useTheme();
+  const trainingHook = useTraining();
   const { isOpen, onClose, onOpen } = useDisclose();
+
+  const [trainingsData, setTrainingsData] = useState<TrainingModel[]>([]);
+
+  const listTrainingsByStorage = async () => {
+    const trainingsStorage = (await trainingHook.getData()) || [];
+
+    setTrainingsData([...trainingsStorage]);
+  };
+
+  const handlePressNewWorkout = () => {
+    navigation.navigate("Workout");
+  };
+
+  const handlePressTrainingItem = (trainingItem: TrainingModel) => {
+    trainingHook.setTrainingActive(trainingItem);
+    navigation.navigate("Training");
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      listTrainingsByStorage();
+    }, []),
+  );
 
   return (
     <>
@@ -35,33 +67,50 @@ export const Home: FunctionComponent = () => {
           },
         }}
       >
-        <VStack flex={1}>
-          <Text color={"text.500"} fontSize={"sm"} px={"6"}>
-            Seus treinos montados
+        <VStack flex={1} mb={"4"}>
+          <Text color={"text.500"} fontWeight={"medium"} px={"6"}>
+            Treinos
           </Text>
 
-          <ScrollView
-            contentContainerStyle={{
-              gap: 8,
-              paddingVertical: 8,
-              paddingHorizontal: 24,
-            }}
-            showsVerticalScrollIndicator={false}
-          >
-            <Card.Container onPress={() => {}}>
-              <VStack flexGrow={1} space={"4"}>
-                <HStack justifyContent={"space-between"} space={"4"}>
-                  <Card.Title text="Poder Total" />
+          {trainingsData.length > 0 ? (
+            <ScrollView
+              contentContainerStyle={{
+                gap: 8,
+                paddingVertical: 8,
+                paddingHorizontal: 24,
+              }}
+              showsVerticalScrollIndicator={false}
+            >
+              {trainingsData.map((trainingItem) => (
+                <Card.Container
+                  key={trainingItem.id}
+                  onPress={() => handlePressTrainingItem(trainingItem)}
+                >
+                  <VStack flexGrow={1} space={"4"}>
+                    <HStack justifyContent={"space-between"} space={"4"}>
+                      <Card.Title text={trainingItem.name} />
 
-                  <Card.LastTrainingDate
-                    lastTraining={moment("01/01/2024", "DD/MM/YYYY")}
-                  />
-                </HStack>
+                      <Card.LastTrainingDate
+                        lastTraining={moment(trainingItem.lastTraining, "MM/DD/YYYY")}
+                      />
+                    </HStack>
 
-                <Card.MuscleChips muscleNames={["tríceps", "peito", "ombro"]} />
-              </VStack>
-            </Card.Container>
-          </ScrollView>
+                    <Card.MuscleChips muscleNames={getAllMuscleTraining(trainingItem.exercises)} />
+                  </VStack>
+                </Card.Container>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text
+              textAlign={"center"}
+              pt={"6"}
+              fontWeight={"light"}
+              fontSize={"md"}
+              color={"text.500"}
+            >
+              Para iniciar, clique em <Text fontWeight={"black"}>Novo Treino</Text>
+            </Text>
+          )}
         </VStack>
 
         <VStack space={"5"}>
@@ -75,6 +124,7 @@ export const Home: FunctionComponent = () => {
                 fontWeight: "medium",
               }}
               borderColor={"rose.600"}
+              onPress={handlePressNewWorkout}
             >
               Novo treino
             </Button>
@@ -104,12 +154,7 @@ export const Home: FunctionComponent = () => {
         >
           <VStack space={"8"}>
             <VStack space={"2"} px={"2"}>
-              <Text
-                color={"white"}
-                fontWeight={"bold"}
-                textAlign={"center"}
-                fontSize={"lg"}
-              >
+              <Text color={"white"} fontWeight={"bold"} textAlign={"center"} fontSize={"lg"}>
                 Com seu apoio, podemos continuar inovando!
               </Text>
               <Text color={"white"} textAlign={"center"} fontSize={"md"}>
@@ -122,12 +167,7 @@ export const Home: FunctionComponent = () => {
                 Doe qualquer valor via Pix
               </Text>
               <Box bgColor={"white"} padding={"3"} borderRadius={"xl"}>
-                <Image
-                  source={QRCodePixImage}
-                  width={"150"}
-                  height={"150"}
-                  alt="qrcode pix"
-                />
+                <Image source={QRCodePixImage} width={"150"} height={"150"} alt="qrcode pix" />
               </Box>
               <Link
                 href="https://nubank.com.br/cobrar/1etqjh/66fe9de3-e156-4c2e-b2ba-7e5565e5a69b"

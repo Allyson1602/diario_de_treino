@@ -1,9 +1,4 @@
-import {
-  BaseToast,
-  ErrorToast,
-  InfoToast,
-  ToastConfig,
-} from "react-native-toast-message";
+import { BaseToast, ErrorToast, InfoToast, ToastConfig } from "react-native-toast-message";
 
 export const toastConfig: ToastConfig = {
   success: (props) => (

@@ -6,9 +6,7 @@ interface ILastTrainingDateProps {
   lastTraining?: Moment;
 }
 
-export const LastTrainingDate: FunctionComponent<ILastTrainingDateProps> = (
-  props
-) => {
+export const LastTrainingDate: FunctionComponent<ILastTrainingDateProps> = (props) => {
   if (!props.lastTraining) return <></>;
 
   return (
