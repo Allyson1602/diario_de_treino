@@ -1,7 +1,7 @@
-import { Button, HStack, Input } from "native-base";
+import { Button, HStack, Input, useTheme } from "native-base";
 import { FunctionComponent } from "react";
 
-const MAX_INPUT_VALUE = 999;
+const MAX_INPUT_VALUE = 999.99;
 const MIN_INPUT_VALUE = 0;
 
 interface WeightInputProps {
@@ -12,6 +12,8 @@ interface WeightInputProps {
 }
 
 export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
+  const theme = useTheme();
+
   const handlePressLess = () => {
     if (props.value >= MIN_INPUT_VALUE) {
       props.onPressLess(props.value - 2.5);
@@ -33,22 +35,21 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
       numericValue <= MAX_INPUT_VALUE
     ) {
       props.onChangeInput(numericValue);
+      return;
     }
+
+    props.onChangeInput(0);
   };
 
   return (
-    <HStack justifyContent={"center"}>
+    <HStack justifyContent={"center"} space={"4"}>
       <Button
+        size={"lg"}
         onPress={handlePressLess}
         isDisabled={props.value <= MIN_INPUT_VALUE}
         _text={{
           color: "text.500",
-        }}
-        _hover={{
-          bg: "muted.400", // Muda a cor de fundo ao passar o mouse (hover)
-        }}
-        _focus={{
-          bg: "muted.500", // Muda a cor de fundo quando focado
+          fontSize: "lg",
         }}
         variant={"unstyled"}
       >
@@ -56,29 +57,35 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
       </Button>
 
       <Input
-        inputMode="numeric"
+        inputMode={"numeric"}
+        caretHidden
+        selectTextOnFocus
+        selectionColor={theme.colors.blue[400]}
         borderWidth={1}
-        bgColor={"white.alpha.50"}
-        borderColor={"muted.300"}
         rounded={"full"}
         textAlign={"center"}
         size={"lg"}
-        width={"20"}
+        width={"32"}
         value={props.value.toString()}
         onChangeText={handleChangeWeight}
+        fontSize={"2xl"}
+        _focus={{
+          borderColor: "primary.500",
+          _android: {
+            selectionColor: theme.colors.blue[400],
+          },
+        }}
+        bgColor={"white:alpha.50"}
+        borderColor={"muted.400"}
       />
 
       <Button
+        size={"lg"}
         onPress={handlePressPlus}
         isDisabled={props.value >= MAX_INPUT_VALUE}
         _text={{
           color: "text.500",
-        }}
-        _hover={{
-          bg: "muted.400", // Muda a cor de fundo ao passar o mouse (hover)
-        }}
-        _focus={{
-          bg: "muted.500", // Muda a cor de fundo quando focado
+          fontSize: "lg",
         }}
         variant={"unstyled"}
       >
