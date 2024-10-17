@@ -50,12 +50,10 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
       name: text,
     });
 
-    trainingHook.updateData([
-      {
-        ...trainingHook.trainingActive!,
-        name: text,
-      },
-    ]);
+    trainingHook.updateData({
+      ...trainingHook.trainingActive!,
+      name: text,
+    });
   };
 
   useFocusEffect(
@@ -92,7 +90,12 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
             onChangeText={handleChangeText}
             ref={trainingNameInputRef}
             InputRightElement={
-              <Feather name="edit-3" size={24} color="black" style={{ opacity: 0 }} />
+              <Feather
+                name="edit-3"
+                size={18}
+                color="black"
+                style={{ opacity: 0, paddingLeft: 8 }}
+              />
             }
             _focus={{
               _android: {
@@ -102,11 +105,11 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
           />
         ) : (
           <Pressable flex={"1"} onPress={handlePressText}>
-            <HStack space={"1"} flex={"1"} justifyContent={"center"} alignItems={"center"}>
+            <HStack space={"2"} flex={"1"} justifyContent={"center"} alignItems={"center"}>
               <Text textAlign={"center"} fontSize={"lg"}>
                 {trainingNameValue}
               </Text>
-              <Feather name="edit-3" size={24} color="black" />
+              <Feather name="edit-3" size={18} color="black" />
             </HStack>
           </Pressable>
         )}
