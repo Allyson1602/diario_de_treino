@@ -1,10 +1,14 @@
-import { Button, HStack, Input, useTheme } from "native-base";
+import { HStack, Input, useTheme } from "native-base";
 import { FunctionComponent } from "react";
+import { Keyboard } from "react-native";
+import { cancelAnimation, SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { convertPointToWasp } from "../utils/convertPointToWasp";
 import { convertWaspToPoint } from "../utils/convertWaspToPoint";
+import { CustomAnimated } from "./ui/CustomAnimated";
 
 const MAX_INPUT_VALUE = 999.99;
 const MIN_INPUT_VALUE = 0;
+const STEP_VALUE = 2.5;
 
 interface WeightInputProps {
   onPressPlus: (newValue: string) => void;
@@ -15,14 +19,37 @@ interface WeightInputProps {
 
 export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
   const theme = useTheme();
+  const scaleLess = useSharedValue(1);
+  const scalePlus = useSharedValue(1);
+
+  const onlyTwoDecimals = (value: string) => {
+    const numberSplit = value.split(".");
+
+    if (numberSplit.length === 2) {
+      return numberSplit[0] + "." + numberSplit[1].slice(0, 2);
+    }
+
+    return value;
+  };
+
+  const defineAnimationOnPress = (scale: SharedValue<number>) => {
+    cancelAnimation(scale);
+
+    scale.value = withTiming(0.8, { duration: 100 }, () => {
+      scale.value = withTiming(1, { duration: 100 });
+    });
+  };
 
   const handlePressLess = () => {
-    const weightNumber = Number(props.value);
+    defineAnimationOnPress(scaleLess);
+    Keyboard.dismiss();
+
+    const weightNumber = parseFloat(convertWaspToPoint(props.value));
 
     if (weightNumber >= MIN_INPUT_VALUE) {
-      const sumWeight = weightNumber - 2.5;
+      const subWeight = weightNumber < STEP_VALUE ? 0 : weightNumber - STEP_VALUE;
 
-      let weightString = String(sumWeight);
+      let weightString = String(subWeight);
       weightString = convertPointToWasp(weightString);
 
       props.onPressLess(weightString);
@@ -30,10 +57,14 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
   };
 
   const handlePressPlus = () => {
-    const weightNumber = Number(props.value);
+    defineAnimationOnPress(scalePlus);
+    Keyboard.dismiss();
+
+    const weightNumber = parseFloat(convertWaspToPoint(props.value) || "0");
 
     if (weightNumber <= MAX_INPUT_VALUE) {
-      const sumWeight = weightNumber + 2.5;
+      const sumWeight =
+        weightNumber > MAX_INPUT_VALUE - STEP_VALUE ? MAX_INPUT_VALUE : weightNumber + STEP_VALUE;
 
       let weightString = String(sumWeight);
       weightString = convertPointToWasp(weightString);
@@ -42,18 +73,9 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
     }
   };
 
-  const onlyTwoDecimals = (value: string) => {
-    const numberSplited = value.split(".");
-
-    if (numberSplited.length === 2) {
-      return numberSplited[0] + "." + numberSplited[1].slice(0, 2);
-    }
-
-    return value;
-  };
-
   const handleChangeWeight = (text: string) => {
     let weightText = convertWaspToPoint(text);
+    weightText = weightText.replace("-", "");
     weightText = onlyTwoDecimals(weightText);
     let weightNumber = parseFloat(weightText);
 
@@ -71,7 +93,7 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
 
   return (
     <HStack justifyContent={"center"} alignItems={"center"} space={"4"}>
-      <Button
+      <CustomAnimated.Button
         size={"lg"}
         onPress={handlePressLess}
         isDisabled={Number(props.value) <= MIN_INPUT_VALUE}
@@ -80,9 +102,10 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
           fontSize: "lg",
         }}
         variant={"unstyled"}
+        style={{ transform: [{ scale: scaleLess }] }}
       >
         -2,5kg
-      </Button>
+      </CustomAnimated.Button>
 
       <Input
         inputMode={"numeric"}
@@ -110,18 +133,19 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
         py={"0"}
       />
 
-      <Button
+      <CustomAnimated.Button
         size={"lg"}
         onPress={handlePressPlus}
-        isDisabled={Number(props.value) >= MAX_INPUT_VALUE}
+        isDisabled={Number(convertWaspToPoint(props.value)) >= MAX_INPUT_VALUE}
         _text={{
           color: "text.700",
           fontSize: "lg",
         }}
         variant={"unstyled"}
+        style={{ transform: [{ scale: scalePlus }] }}
       >
         +2,5kg
-      </Button>
+      </CustomAnimated.Button>
     </HStack>
   );
 };
