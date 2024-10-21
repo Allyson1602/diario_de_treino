@@ -74,7 +74,7 @@ export const Workout: FunctionComponent = () => {
           icon={
             <MaterialCommunityIcons
               name="fire"
-              size={50}
+              size={45}
               color={true ? theme.colors.primary[500] : theme.colors.muted[400]}
             />
           }
@@ -100,7 +100,7 @@ export const Workout: FunctionComponent = () => {
           </Badge>
           <CustomAnimated.IconButton
             variant={"unstyled"}
-            icon={<Ionicons name="body-outline" size={40} color={theme.colors.lightBlue[500]} />}
+            icon={<Ionicons name="body-outline" size={35} color={theme.colors.lightBlue[500]} />}
           />
         </Box>
       </VStack>
