@@ -1,54 +1,82 @@
 import { Button, HStack, Input, useTheme } from "native-base";
 import { FunctionComponent } from "react";
+import { convertPointToWasp } from "../utils/convertPointToWasp";
+import { convertWaspToPoint } from "../utils/convertWaspToPoint";
 
 const MAX_INPUT_VALUE = 999.99;
 const MIN_INPUT_VALUE = 0;
 
 interface WeightInputProps {
-  onPressPlus: (newValue: number) => void;
-  onPressLess: (newValue: number) => void;
-  onChangeInput: (value: number) => void;
-  value: number;
+  onPressPlus: (newValue: string) => void;
+  onPressLess: (newValue: string) => void;
+  onChangeInput: (value: string) => void;
+  value: string;
 }
 
 export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
   const theme = useTheme();
 
   const handlePressLess = () => {
-    if (props.value >= MIN_INPUT_VALUE) {
-      props.onPressLess(props.value - 2.5);
+    const weightNumber = Number(props.value);
+
+    if (weightNumber >= MIN_INPUT_VALUE) {
+      const sumWeight = weightNumber - 2.5;
+
+      let weightString = String(sumWeight);
+      weightString = convertPointToWasp(weightString);
+
+      props.onPressLess(weightString);
     }
   };
 
   const handlePressPlus = () => {
-    if (props.value <= MAX_INPUT_VALUE) {
-      props.onPressPlus(props.value + 2.5);
+    const weightNumber = Number(props.value);
+
+    if (weightNumber <= MAX_INPUT_VALUE) {
+      const sumWeight = weightNumber + 2.5;
+
+      let weightString = String(sumWeight);
+      weightString = convertPointToWasp(weightString);
+
+      props.onPressPlus(weightString);
     }
+  };
+
+  const onlyTwoDecimals = (value: string) => {
+    const numberSplited = value.split(".");
+
+    if (numberSplited.length === 2) {
+      return numberSplited[0] + "." + numberSplited[1].slice(0, 2);
+    }
+
+    return value;
   };
 
   const handleChangeWeight = (text: string) => {
-    const numericValue = parseFloat(text);
+    let weightText = convertWaspToPoint(text);
+    weightText = onlyTwoDecimals(weightText);
+    let weightNumber = parseFloat(weightText);
 
     if (
-      !isNaN(numericValue) &&
-      numericValue >= MIN_INPUT_VALUE &&
-      numericValue <= MAX_INPUT_VALUE
+      (!isNaN(weightNumber) &&
+        weightNumber >= MIN_INPUT_VALUE &&
+        weightNumber <= MAX_INPUT_VALUE) ||
+      weightText === ""
     ) {
-      props.onChangeInput(numericValue);
+      const weightString = convertPointToWasp(weightText);
+      props.onChangeInput(weightString);
       return;
     }
-
-    props.onChangeInput(0);
   };
 
   return (
-    <HStack justifyContent={"center"} space={"4"}>
+    <HStack justifyContent={"center"} alignItems={"center"} space={"4"}>
       <Button
         size={"lg"}
         onPress={handlePressLess}
-        isDisabled={props.value <= MIN_INPUT_VALUE}
+        isDisabled={Number(props.value) <= MIN_INPUT_VALUE}
         _text={{
-          color: "text.500",
+          color: "text.700",
           fontSize: "lg",
         }}
         variant={"unstyled"}
@@ -66,7 +94,9 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
         textAlign={"center"}
         size={"lg"}
         width={"32"}
-        value={props.value.toString()}
+        height={"12"}
+        value={convertPointToWasp(props.value)}
+        placeholder="0"
         onChangeText={handleChangeWeight}
         fontSize={"2xl"}
         _focus={{
@@ -77,14 +107,15 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
         }}
         bgColor={"white:alpha.50"}
         borderColor={"muted.400"}
+        py={"0"}
       />
 
       <Button
         size={"lg"}
         onPress={handlePressPlus}
-        isDisabled={props.value >= MAX_INPUT_VALUE}
+        isDisabled={Number(props.value) >= MAX_INPUT_VALUE}
         _text={{
-          color: "text.500",
+          color: "text.700",
           fontSize: "lg",
         }}
         variant={"unstyled"}
