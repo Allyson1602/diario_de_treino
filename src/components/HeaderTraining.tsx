@@ -7,6 +7,7 @@ import { FunctionComponent, useCallback, useRef, useState } from "react";
 import { useTraining } from "../hooks/useTraining";
 import { CustomAnimated } from "./ui/CustomAnimated";
 import { cancelAnimation, useSharedValue, withTiming } from "react-native-reanimated";
+import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 
 const DEFAULT_TRAINING_NAME = "Nome do treino";
 
@@ -67,7 +68,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
   return (
     <HStack safeArea p={"4"} alignItems={"center"}>
       <CustomAnimated.IconButton
-        icon={<Ionicons name="chevron-back" size={32} color="black" />}
+        icon={<SimpleLineIcons name="arrow-left" size={22} color="black" />}
         onPress={handleGoBack}
         rounded={"full"}
         style={{ transform: [{ scale }] }}
