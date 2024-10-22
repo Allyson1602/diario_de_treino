@@ -38,7 +38,7 @@ class TrainingStorage implements IStorageData<TrainingModel> {
     return [];
   }
 
-  private filterUpdatedTrainings(trainingsData: TrainingModel[], trainingValue: TrainingModel) {
+  filterUpdatedTrainings = (trainingsData: TrainingModel[], trainingValue: TrainingModel) => {
     return trainingsData.map((trainingItem) => {
       if (trainingItem.id === trainingValue.id) {
         return trainingValue;
@@ -46,9 +46,9 @@ class TrainingStorage implements IStorageData<TrainingModel> {
 
       return trainingItem;
     });
-  }
+  };
 
-  async updateData(trainingValue: TrainingModel) {
+  updateData = async (trainingValue: TrainingModel) => {
     const trainingsData = await this.getData();
 
     if (trainingsData) {
@@ -68,7 +68,7 @@ class TrainingStorage implements IStorageData<TrainingModel> {
         });
       }
     }
-  }
+  };
 
   async removeData(value: TrainingModel): Promise<boolean> {
     const trainingData = await this.getData();
