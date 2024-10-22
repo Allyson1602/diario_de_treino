@@ -1,5 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Crypto from "expo-crypto";
+import moment from "moment";
 import Toast from "react-native-toast-message";
+import { generateOrderAlphabetName } from "../helpers/generateOrderAlphabetName";
 import { IStorageData } from "../interfaces/storageData";
 import { ExerciseModel } from "../models/exercise.model";
 import { TrainingModel } from "../models/training.model";
@@ -15,12 +18,58 @@ interface IUseTraining extends IStorageData<TrainingModel> {
   trainingActive: TrainingModel | null;
   setTrainingActive: (newExercise: TrainingModel | null) => void;
   removeExercise: (exerciseRemove: ExerciseModel) => Promise<boolean>;
+  createExercise: () => ExerciseModel;
 }
 
 export const useTraining = (): IUseTraining => {
   const exerciseData = useAppSelector((state) => state.exercise.value);
   const trainingData = useAppSelector((state) => state.training.value);
   const dispatch = useAppDispatch();
+
+  const getMoreRecentExercise = (): ExerciseModel | null => {
+    if (trainingData) {
+      let lastExercise: ExerciseModel | null = null;
+
+      trainingData.exercises.forEach((item, index) => {
+        const exerciseDate = moment(item.createdDate);
+        const exerciseBeforeDate = moment(trainingData.exercises[index].createdDate);
+
+        if (moment.max(exerciseDate, exerciseBeforeDate) !== exerciseDate) {
+          lastExercise = trainingData.exercises[index];
+          return;
+        }
+
+        lastExercise = item;
+      });
+
+      return lastExercise;
+    }
+
+    return null;
+  };
+
+  const generateExerciseName = (): string => {
+    const recentExercise = getMoreRecentExercise();
+
+    if (trainingData && recentExercise) {
+      const recentExerciseName = recentExercise.name || "Exercício";
+
+      return generateOrderAlphabetName(recentExerciseName);
+    }
+
+    return "Exercício " + Crypto.randomUUID().slice(0, 5);
+  };
+
+  const createExercise = (): ExerciseModel => {
+    const exerciseUuid = Crypto.randomUUID();
+
+    return {
+      id: exerciseUuid,
+      name: generateExerciseName(),
+      muscles: [],
+      createdDate: moment().format(),
+    };
+  };
 
   const setTrainingActive = (newTraining: TrainingModel | null) => {
     dispatch(setTraining(newTraining));
@@ -72,6 +121,8 @@ export const useTraining = (): IUseTraining => {
     setData: trainingStorage.setData,
     updateData: trainingStorage.updateData,
     removeData: trainingStorage.removeData,
+
+    createExercise,
     removeExercise,
 
     trainingActive: trainingData,
