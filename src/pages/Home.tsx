@@ -38,7 +38,14 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
     setTrainingsData([...trainingsStorage]);
   };
 
+  const createExercise = (): void => {
+    const newExercise = trainingHook.createExercise();
+    trainingHook.setExerciseActive(newExercise);
+  };
+
   const handlePressNewWorkout = () => {
+    void createExercise();
+
     navigation.navigate("Workout");
   };
 

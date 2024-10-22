@@ -36,9 +36,16 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
     });
   };
 
+  const createExercise = (): void => {
+    const newExercise = trainingHook.createExercise();
+    trainingHook.setExerciseActive(newExercise);
+  };
+
   const handlePressNewWorkout = () => {
-    navigation.navigate("Workout");
     defineAnimationOnPress(scaleAddWorkout);
+
+    void createExercise();
+    navigation.navigate("Workout");
   };
 
   const handleRemoveExercise = (exerciseSelected: ExerciseModel) => {
