@@ -19,6 +19,7 @@ interface IUseTraining extends IStorageData<TrainingModel> {
   setTrainingActive: (newExercise: TrainingModel | null) => void;
   removeExercise: (exerciseRemove: ExerciseModel) => Promise<boolean>;
   createExercise: () => ExerciseModel;
+  createTraining: () => Promise<TrainingModel>;
 }
 
 export const useTraining = (): IUseTraining => {
@@ -48,16 +49,64 @@ export const useTraining = (): IUseTraining => {
     return null;
   };
 
-  const generateExerciseName = (): string => {
-    const recentExercise = getMoreRecentExercise();
+  const getMoreRecentTraining = async (): Promise<TrainingModel | null> => {
+    const trainingsStorage = await trainingStorage.getData();
 
-    if (trainingData && recentExercise) {
-      const recentExerciseName = recentExercise.name || "Exercício";
+    if (trainingsStorage) {
+      let lastTraining: TrainingModel | null = null;
 
-      return generateOrderAlphabetName(recentExerciseName);
+      trainingsStorage.forEach((item, index) => {
+        const trainingDate = moment(item.createdDate);
+        const trainingBeforeDate = moment(trainingsStorage[index].createdDate);
+
+        if (moment.max(trainingDate, trainingBeforeDate) !== trainingDate) {
+          lastTraining = trainingsStorage[index];
+          return;
+        }
+
+        lastTraining = item;
+      });
+
+      return lastTraining;
     }
 
-    return "Exercício " + Crypto.randomUUID().slice(0, 5);
+    return null;
+  };
+
+  const generateExerciseName = (): string => {
+    const recentExercise = getMoreRecentExercise();
+    const recentExerciseNameSplit = recentExercise?.name.split(" ");
+
+    const newName = recentExercise?.name
+      ? "Exercício" + (" " + recentExerciseNameSplit?.[recentExerciseNameSplit.length - 1])
+      : "Exercício";
+
+    return generateOrderAlphabetName(newName);
+  };
+
+  const generateTrainingName = async (): Promise<string> => {
+    const recentTraining = await getMoreRecentTraining();
+    const recentTrainingNameSplit = recentTraining?.name.split(" ");
+
+    console.log(recentTrainingNameSplit?.[recentTrainingNameSplit.length - 1]);
+    const newName = recentTraining?.name
+      ? "Treino" + (" " + recentTrainingNameSplit?.[recentTrainingNameSplit.length - 1])
+      : "Treino";
+
+    return generateOrderAlphabetName(newName);
+  };
+
+  const createTraining = async (): Promise<TrainingModel> => {
+    const trainingUuid = Crypto.randomUUID();
+
+    const newTraining: TrainingModel = {
+      id: trainingUuid,
+      name: await generateTrainingName(),
+      exercises: [],
+      createdDate: moment().format("MM-DD-YYYY"),
+    };
+
+    return newTraining;
   };
 
   const createExercise = (): ExerciseModel => {
@@ -67,7 +116,7 @@ export const useTraining = (): IUseTraining => {
       id: exerciseUuid,
       name: generateExerciseName(),
       muscles: [],
-      createdDate: moment().format(),
+      createdDate: moment().format("MM-DD-YYYY"),
     };
   };
 
@@ -122,6 +171,7 @@ export const useTraining = (): IUseTraining => {
     updateData: trainingStorage.updateData,
     removeData: trainingStorage.removeData,
 
+    createTraining,
     createExercise,
     removeExercise,
 
