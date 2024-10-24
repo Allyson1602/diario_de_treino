@@ -21,17 +21,8 @@ export const FinishTrainingModal: FunctionComponent<IFinishTrainingModal> = ({
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handlePressFinished = () => {
-    if (trainingHook.trainingActive) {
-      const trainingUpdated: TrainingModel = {
-        ...trainingHook.trainingActive,
-        lastTraining: moment().format("MM/DD/YYYY"),
-      };
-
-      trainingHook.updateData(trainingUpdated);
-
-      trainingHook.setExerciseActive(null);
-      trainingHook.setTrainingActive(null);
-    }
+    trainingHook.setExerciseActive(null);
+    trainingHook.setTrainingActive(null);
 
     navigation.navigate("Home");
   };
