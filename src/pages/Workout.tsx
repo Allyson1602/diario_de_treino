@@ -1,17 +1,173 @@
-import { Badge, Box, HStack, Text, TextArea, useTheme, VStack } from "native-base";
-import { FunctionComponent } from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Badge, Box, HStack, Text, TextArea, useDisclose, useTheme, VStack } from "native-base";
+import { FunctionComponent, useState } from "react";
+import { ExerciseNavigation } from "../components/ExerciseNavigation";
+import { ExerciseTimer } from "../components/ExerciseTimer";
+import { FinishTrainingModal } from "../components/FinishTrainingModal";
+import { MuscleModal } from "../components/MuscleModal";
 import { CustomAnimated } from "../components/ui/CustomAnimated";
 import { VerticalNumberInput } from "../components/VerticalNumberInput";
-import { ExerciseTimer } from "../components/ExerciseTimer";
-import { ExerciseNavigation } from "../components/ExerciseNavigation";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { WeightInput } from "../components/WeightInput";
+import { useTraining } from "../hooks/useTraining";
+import { ExerciseModel } from "../models/exercise.model";
+import { RootStackParamList } from "../navigation";
 
-export const Workout: FunctionComponent = () => {
+type WorkoutProps = NativeStackScreenProps<RootStackParamList, "Workout", "RootStack">;
+
+export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   const theme = useTheme();
+  const trainingHook = useTraining();
+  const finishDisclose = useDisclose();
+  const muscleDisclose = useDisclose();
+
+  const exercisesList = trainingHook.trainingActive?.exercises;
+
+  const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
+
+  const updateData = (exerciseUpdated: ExerciseModel) => {
+    const exercisesTraining = trainingHook.trainingActive?.exercises || [];
+
+    const updateExercisesTraining = exercisesTraining.map((exerciseItem) => {
+      if (exerciseItem.id === exerciseUpdated.id) {
+        return exerciseUpdated;
+      }
+
+      return exerciseItem;
+    });
+
+    trainingHook.updateData({
+      ...trainingHook.trainingActive!,
+      exercises: updateExercisesTraining,
+    });
+
+    trainingHook.setExerciseActive(exerciseUpdated);
+  };
+
+  const updateRepetitionsData = (repetitionValue: number | null) => {
+    const exerciseActive = trainingHook.exerciseActive;
+
+    if (exerciseActive) {
+      const exerciseUpdated: ExerciseModel = {
+        ...exerciseActive,
+        repetitions: repetitionValue || 0,
+      };
+
+      void updateData(exerciseUpdated);
+    }
+  };
+
+  const createExercise = (): void => {
+    const newExercise = trainingHook.createExercise();
+    trainingHook.setExerciseActive(newExercise);
+  };
+
+  const updateWeightData = (weightValue: string) => {
+    const exerciseActive = trainingHook.exerciseActive;
+
+    if (exerciseActive) {
+      const exerciseUpdated: ExerciseModel = {
+        ...exerciseActive,
+        weight: weightValue,
+      };
+
+      void updateData(exerciseUpdated);
+    }
+  };
+
+  const handlePressOpenFinish = () => {
+    finishDisclose.onOpen();
+  };
+
+  const handlePressOpenMuscle = () => {
+    muscleDisclose.onOpen();
+  };
+
+  const handleChangeAnnotation = (text: string) => {
+    const exerciseActive = trainingHook.exerciseActive;
+
+    if (exerciseActive) {
+      const exerciseUpdated: ExerciseModel = {
+        ...exerciseActive,
+        annotation: text,
+      };
+
+      void updateData(exerciseUpdated);
+    }
+  };
+
+  const handleChangeMaxRepetition = (repetitionValue: number | null) => {
+    void updateRepetitionsData(repetitionValue);
+  };
+
+  const handlePressDownMaxRepetition = (repetitionValue: number | null) => {
+    void updateRepetitionsData(repetitionValue);
+  };
+
+  const handlePressUpMaxRepetition = (repetitionValue: number | null) => {
+    void updateRepetitionsData(repetitionValue);
+  };
+
+  const handleChangeWeight = (weightValue: string) => {
+    void updateWeightData(weightValue);
+  };
+
+  const handlePressPlusWeight = (weightValue: string) => {
+    void updateWeightData(weightValue);
+  };
+
+  const handlePressLessWeight = (weightValue: string) => {
+    void updateWeightData(weightValue);
+  };
+
+  const handleChangeTimer = (timerValue: string) => {
+    const exerciseActive = trainingHook.exerciseActive;
+
+    if (exerciseActive) {
+      const exerciseUpdated: ExerciseModel = {
+        ...exerciseActive,
+        timer: timerValue,
+      };
+
+      void updateData(exerciseUpdated);
+    }
+  };
+
+  const handlePressNavigateNext = () => {
+    createExercise();
+
+    const trainingActive = trainingHook.trainingActive;
+    const exerciseActive = trainingHook.exerciseActive;
+
+    if (trainingActive && exerciseActive) {
+      const updateTraining = {
+        ...trainingActive,
+        exercises: [...trainingActive.exercises, exerciseActive],
+      };
+
+      trainingHook.setTrainingActive(updateTraining);
+      trainingHook.updateData(updateTraining);
+
+      setRepetitionValue(null);
+
+      navigation.push("Workout");
+    }
+  };
+
+  const handlePressNavigateBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  };
+
+  const handlePressTimer = () => {
+    //
+  };
 
   return (
     <Box
+      safeArea
       position={"relative"}
       flex={"1"}
       background={{
@@ -22,14 +178,23 @@ export const Workout: FunctionComponent = () => {
         },
       }}
     >
-      <VStack flex={"1"} justifyContent={"space-between"} alignItems={"center"} pt={"6"} pb={"2"}>
-        <VStack space={"1"} alignItems={"center"} px={"6"}>
+      <VStack
+        safeArea
+        flex={"1"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        pt={"8"}
+        pb={"2"}
+      >
+        <VStack safeArea space={"1"} alignItems={"center"} px={"6"}>
           <Text fontSize={"md"} color={"text.900"} fontWeight={"medium"}>
             Anotações
           </Text>
 
           <Box pr={"8"}>
             <TextArea
+              value={trainingHook.exerciseActive?.annotation}
+              onChangeText={handleChangeAnnotation}
               autoCompleteType={true}
               placeholder="Digite aqui suas anotações..."
               w={"full"}
@@ -45,30 +210,59 @@ export const Workout: FunctionComponent = () => {
             Repetições
           </Text>
           <HStack alignItems={"center"} space={"2"}>
-            <VerticalNumberInput />
+            <VerticalNumberInput
+              value={repetitionValue}
+              onChangeInput={setRepetitionValue}
+              onPressCaretDown={setRepetitionValue}
+              onPressCaretUp={setRepetitionValue}
+            />
             <Text fontSize={"lg"} color={"text.900"} fontWeight={"medium"}>
               de
             </Text>
-            <VerticalNumberInput />
+            <VerticalNumberInput
+              value={trainingHook.exerciseActive?.repetitions}
+              onChangeInput={handleChangeMaxRepetition}
+              onPressCaretDown={handlePressDownMaxRepetition}
+              onPressCaretUp={handlePressUpMaxRepetition}
+            />
           </HStack>
         </VStack>
 
-        <VStack space={"1"}>
+        <VStack space={"1"} alignItems={"center"}>
           <Text fontSize={"md"} color={"text.900"} fontWeight={"medium"}>
             Carga
           </Text>
+
+          <WeightInput
+            value={trainingHook.exerciseActive?.weight || ""}
+            onChangeInput={handleChangeWeight}
+            onPressLess={handlePressLessWeight}
+            onPressPlus={handlePressPlusWeight}
+          />
         </VStack>
 
         <VStack>
-          <ExerciseTimer onChangeTimerValue={() => {}} onPressTimer={() => {}} timerValue="2:00" />
+          <ExerciseTimer
+            timerValue={trainingHook.exerciseActive?.timer || "2:00"}
+            onChangeTimerValue={handleChangeTimer}
+            onPressTimer={handlePressTimer}
+          />
 
           <HStack justifyContent={"center"}>
-            <ExerciseNavigation onPressLeft={() => {}} onPressRight={() => {}} />
+            <ExerciseNavigation
+              leftIconDisabled={
+                !exercisesList ||
+                !exercisesList[0] ||
+                exercisesList[0].id === trainingHook.exerciseActive?.id
+              }
+              onPressLeft={handlePressNavigateBack}
+              onPressRight={handlePressNavigateNext}
+            />
           </HStack>
         </VStack>
       </VStack>
 
-      <VStack position={"absolute"} top={"0"} right={"0"}>
+      <VStack safeArea position={"absolute"} top={"16"} right={"0"}>
         <CustomAnimated.IconButton
           variant={"unstyled"}
           icon={
@@ -78,6 +272,7 @@ export const Workout: FunctionComponent = () => {
               color={true ? theme.colors.primary[500] : theme.colors.muted[400]}
             />
           }
+          onPress={handlePressOpenFinish}
         />
 
         <Box>
@@ -96,14 +291,19 @@ export const Workout: FunctionComponent = () => {
               fontSize: 12,
             }}
           >
-            2
+            {trainingHook.exerciseActive?.muscles.length || 0}
           </Badge>
+
           <CustomAnimated.IconButton
             variant={"unstyled"}
             icon={<Ionicons name="body-outline" size={35} color={theme.colors.lightBlue[500]} />}
+            onPress={handlePressOpenMuscle}
           />
         </Box>
       </VStack>
+
+      <FinishTrainingModal isOpen={finishDisclose.isOpen} onClose={finishDisclose.onClose} />
+      <MuscleModal isOpen={muscleDisclose.isOpen} onClose={muscleDisclose.onClose} />
     </Box>
   );
 };
