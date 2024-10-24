@@ -35,7 +35,15 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   const listTrainingsByStorage = async () => {
     const trainingsStorage = (await trainingHook.getData()) || [];
 
-    setTrainingsData([...trainingsStorage]);
+    setTrainingsData(trainingsStorage);
+  };
+
+  const createTraining = async () => {
+    const newTraining = await trainingHook.createTraining();
+    const trainingList = await trainingHook.getData();
+
+    trainingHook.setTrainingActive(newTraining);
+    trainingHook.setData([...trainingList, newTraining]);
   };
 
   const createExercise = (): void => {
@@ -44,6 +52,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   };
 
   const handlePressNewWorkout = () => {
+    void createTraining();
     void createExercise();
 
     navigation.navigate("Workout");
@@ -98,7 +107,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
                       <Card.Title text={trainingItem.name} />
 
                       <Card.LastTrainingDate
-                        lastTraining={moment(trainingItem.lastTraining, "MM/DD/YYYY")}
+                        lastTraining={moment(trainingItem.createdDate, "MM-DD-YYYY")}
                       />
                     </HStack>
 
