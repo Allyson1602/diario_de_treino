@@ -55,7 +55,7 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
       name: text,
     };
 
-    const exercisesTraining = trainingHook.trainingActive!.exercises || [];
+    const exercisesTraining = trainingHook.trainingActive?.exercises || [];
 
     const hasExerciseTraining = exercisesTraining.some(({ id }) => id === exerciseUpdated.id);
     let updateExercisesTraining: ExerciseModel[] = [];

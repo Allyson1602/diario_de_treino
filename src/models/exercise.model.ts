@@ -3,7 +3,7 @@ export interface ExerciseModel {
   name: string;
   annotation?: string;
   repetitions?: number;
-  weight?: number;
+  weight?: string;
   timer?: string;
   muscles: string[];
   createdDate: string;

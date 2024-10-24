@@ -1,5 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Icon, Input, VStack } from "native-base";
+import { Icon, Input, useTheme, VStack } from "native-base";
 import React, { FunctionComponent } from "react";
 import { GestureResponderEvent, TouchableOpacity } from "react-native";
 import { isNumber } from "../utils/isNumber";
@@ -16,6 +16,8 @@ interface VerticalNumberInputProps {
 }
 
 export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = (props) => {
+  const theme = useTheme();
+
   const defineMaxNumberValue = (numberValue: number | null) => {
     if (!numberValue) return null;
 
@@ -74,9 +76,13 @@ export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = 
       <Input
         inputMode={"numeric"}
         caretHidden
+        selectTextOnFocus
         _focus={{
           bgColor: "#FFFFFF80",
           borderColor: "primary.500",
+          _android: {
+            selectionColor: theme.colors.blue[400],
+          },
         }}
         bgColor={"#FFFFFF00"}
         borderColor={"muted.400"}
@@ -92,6 +98,7 @@ export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = 
         height={"16"}
         value={props.value?.toString() || undefined}
         onChangeText={handleChangeInput}
+        selectionColor={theme.colors.blue[400]}
       />
 
       <TouchableOpacity

@@ -1,8 +1,8 @@
 import { ExerciseModel } from "./exercise.model";
 
 export interface TrainingModel {
-  id: number;
+  id: string;
   name: string;
-  lastTraining: string;
   exercises: ExerciseModel[];
+  createdDate: string;
 }

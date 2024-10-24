@@ -32,7 +32,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
 
   const handleGoBack = () => {
     defineGoBackAnimationOnPress();
-    props.navigation.goBack();
+    props.navigation.navigate("Home");
   };
 
   const handlePressText = () => {

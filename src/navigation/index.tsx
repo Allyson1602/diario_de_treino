@@ -47,7 +47,13 @@ export const Navigation: FunctionComponent = () => {
 
   return (
     <NavigationContainer onReady={onLayoutRootView}>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          statusBarTranslucent: true,
+          statusBarStyle: "dark",
+        }}
+      >
         <Stack.Screen
           name="Home"
           component={Home}
