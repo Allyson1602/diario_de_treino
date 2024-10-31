@@ -1,13 +1,13 @@
 import Feather from "@expo/vector-icons/Feather";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { HStack, Input, Pressable, Text, useTheme } from "native-base";
 import { FunctionComponent, useCallback, useRef, useState } from "react";
+import { cancelAnimation, useSharedValue, withTiming } from "react-native-reanimated";
+import Toast from "react-native-toast-message";
 import { useTraining } from "../hooks/useTraining";
 import { CustomAnimated } from "./ui/CustomAnimated";
-import { cancelAnimation, useSharedValue, withTiming } from "react-native-reanimated";
-import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 
 const DEFAULT_TRAINING_NAME = "Nome do treino";
 
@@ -30,6 +30,12 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
     });
   };
 
+  const hasTrainingName = async (newTrainingName: string) => {
+    const trainingsList = await trainingHook.getData();
+
+    return trainingsList.some((trainingItem) => trainingItem.name === newTrainingName);
+  };
+
   const handleGoBack = () => {
     defineGoBackAnimationOnPress();
     props.navigation.navigate("Home");
@@ -39,22 +45,38 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
     setIsActive(true);
   };
 
-  const handleBlurInput = () => {
+  const handleBlurInput = async () => {
     setIsActive(false);
-  };
 
-  const handleChangeText = (text: string) => {
-    setTrainingNameValue(text);
+    const existTrainingName = await hasTrainingName(trainingNameValue);
+
+    if (existTrainingName) {
+      const recoverLastName = trainingHook.trainingActive!.name;
+      setTrainingNameValue(recoverLastName);
+      setIsActive(true);
+
+      Toast.show({
+        type: "error",
+        text1: "Treino 💪",
+        text2: "Esse nome já existe, informe outro.",
+        position: "bottom",
+      });
+      return;
+    }
 
     trainingHook.setTrainingActive({
       ...trainingHook.trainingActive!,
-      name: text,
+      name: trainingNameValue,
     });
 
     trainingHook.updateData({
       ...trainingHook.trainingActive!,
-      name: text,
+      name: trainingNameValue,
     });
+  };
+
+  const handleChangeText = (text: string) => {
+    setTrainingNameValue(text);
   };
 
   useFocusEffect(
