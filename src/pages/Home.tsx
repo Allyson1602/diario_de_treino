@@ -134,12 +134,10 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
             <MotivationPhrases />
 
             <Button
-              variant={"outline"}
+              variant={"solid"}
               _text={{
-                color: "rose.600",
                 fontWeight: "medium",
               }}
-              borderColor={"rose.600"}
               onPress={handlePressNewWorkout}
             >
               Novo treino
