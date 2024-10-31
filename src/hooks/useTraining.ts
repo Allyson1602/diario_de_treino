@@ -88,7 +88,6 @@ export const useTraining = (): IUseTraining => {
     const recentTraining = await getMoreRecentTraining();
     const recentTrainingNameSplit = recentTraining?.name.split(" ");
 
-    console.log(recentTrainingNameSplit?.[recentTrainingNameSplit.length - 1]);
     const newName = recentTraining?.name
       ? "Treino" + (" " + recentTrainingNameSplit?.[recentTrainingNameSplit.length - 1])
       : "Treino";
