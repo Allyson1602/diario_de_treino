@@ -8,7 +8,7 @@ import { ExerciseTimer } from "../components/ExerciseTimer";
 import { FinishTrainingModal } from "../components/FinishTrainingModal";
 import { MuscleModal } from "../components/MuscleModal";
 import { CustomAnimated } from "../components/ui/CustomAnimated";
-import { VerticalNumberInput } from "../components/VerticalNumberInput";
+import { MAX_INPUT_VALUE, VerticalNumberInput } from "../components/VerticalNumberInput";
 import { WeightInput } from "../components/WeightInput";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
@@ -161,8 +161,12 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     }
   };
 
-  const handlePressTimer = () => {
-    //
+  const handleTimerEnd = () => {
+    setRepetitionValue((currentRepetitionValue) => {
+      if (currentRepetitionValue === MAX_INPUT_VALUE) return currentRepetitionValue;
+
+      return currentRepetitionValue ? currentRepetitionValue + 1 : 1;
+    });
   };
 
   return (
@@ -245,7 +249,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
           <ExerciseTimer
             timerValue={trainingHook.exerciseActive?.timer || "2:00"}
             onChangeTimerValue={handleChangeTimer}
-            onPressTimer={handlePressTimer}
+            onTimerEnd={handleTimerEnd}
           />
 
           <HStack justifyContent={"center"}>
