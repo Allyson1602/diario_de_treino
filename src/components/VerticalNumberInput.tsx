@@ -5,7 +5,7 @@ import { GestureResponderEvent, TouchableOpacity } from "react-native";
 import { isNumber } from "../utils/isNumber";
 import { onlyPositiveNumber } from "../utils/onlyPositiveNumber";
 
-const MAX_INPUT_VALUE = 99;
+export const MAX_INPUT_VALUE = 99;
 const MIN_INPUT_VALUE = 0;
 
 interface VerticalNumberInputProps {
