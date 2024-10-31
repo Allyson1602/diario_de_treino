@@ -38,21 +38,24 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
     setTrainingsData(trainingsStorage);
   };
 
-  const createTraining = async () => {
+  const createExercise = async () => {
     const newTraining = await trainingHook.createTraining();
-    const trainingList = await trainingHook.getData();
-
-    trainingHook.setTrainingActive(newTraining);
-    trainingHook.setData([...trainingList, newTraining]);
-  };
-
-  const createExercise = (): void => {
     const newExercise = trainingHook.createExercise();
+
     trainingHook.setExerciseActive(newExercise);
+
+    if (newTraining) {
+      const updateTraining = {
+        ...newTraining,
+        exercises: [...newTraining.exercises, newExercise],
+      };
+
+      trainingHook.setTrainingActive(updateTraining);
+      trainingHook.updateData(updateTraining);
+    }
   };
 
-  const handlePressNewWorkout = () => {
-    void createTraining();
+  const handlePressNewWorkout = async () => {
     void createExercise();
 
     navigation.navigate("Workout");
@@ -65,6 +68,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      // AsyncStorage.clear();
       listTrainingsByStorage();
     }, []),
   );
@@ -106,9 +110,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
                     <HStack justifyContent={"space-between"} space={"4"}>
                       <Card.Title text={trainingItem.name} />
 
-                      <Card.LastTrainingDate
-                        lastTraining={moment(trainingItem.createdDate, "MM-DD-YYYY")}
-                      />
+                      <Card.LastTrainingDate lastTraining={moment(trainingItem.createdDate)} />
                     </HStack>
 
                     <Card.MuscleChips muscleNames={getAllMuscleTraining(trainingItem.exercises)} />
@@ -134,10 +136,12 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
             <MotivationPhrases />
 
             <Button
-              variant={"solid"}
+              variant={"outline"}
               _text={{
+                color: "rose.600",
                 fontWeight: "medium",
               }}
+              borderColor={"rose.600"}
               onPress={handlePressNewWorkout}
             >
               Novo treino

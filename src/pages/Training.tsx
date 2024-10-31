@@ -36,23 +36,25 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
     });
   };
 
-  const createTraining = async () => {
-    const newTraining = await trainingHook.createTraining();
-    const trainingList = await trainingHook.getData();
-
-    trainingHook.setTrainingActive(newTraining);
-    trainingHook.setData([...trainingList, newTraining]);
-  };
-
   const createExercise = (): void => {
+    const trainingActive = trainingHook.trainingActive;
     const newExercise = trainingHook.createExercise();
     trainingHook.setExerciseActive(newExercise);
+
+    if (trainingActive) {
+      const updateTraining = {
+        ...trainingActive,
+        exercises: [...trainingActive.exercises, newExercise],
+      };
+
+      trainingHook.setTrainingActive(updateTraining);
+      trainingHook.updateData(updateTraining);
+    }
   };
 
   const handlePressNewWorkout = () => {
     defineAnimationOnPress(scaleAddWorkout);
 
-    void createTraining();
     void createExercise();
     navigation.navigate("Workout");
   };
@@ -75,8 +77,11 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
 
     if (firstExercise) {
       trainingHook.setExerciseActive(firstExercise);
-      navigation.navigate("Workout");
+    } else {
+      void createExercise();
     }
+
+    navigation.navigate("Workout");
   };
 
   const handlePressExerciseItem = (exerciseItem: ExerciseModel) => {

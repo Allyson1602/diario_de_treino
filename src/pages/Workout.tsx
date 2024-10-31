@@ -1,8 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Badge, Box, HStack, Text, TextArea, useDisclose, useTheme, VStack } from "native-base";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useCallback, useState } from "react";
 import { ExerciseNavigation } from "../components/ExerciseNavigation";
 import { ExerciseTimer } from "../components/ExerciseTimer";
 import { FinishTrainingModal } from "../components/FinishTrainingModal";
@@ -22,9 +23,8 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   const finishDisclose = useDisclose();
   const muscleDisclose = useDisclose();
 
-  const exercisesList = trainingHook.trainingActive?.exercises;
-
   const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
+  const [exercisesList, setExercisesList] = useState<ExerciseModel[]>([]);
 
   const updateData = (exerciseUpdated: ExerciseModel) => {
     const exercisesTraining = trainingHook.trainingActive?.exercises || [];
@@ -59,8 +59,20 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   };
 
   const createExercise = (): void => {
+    const trainingActive = trainingHook.trainingActive;
     const newExercise = trainingHook.createExercise();
+
     trainingHook.setExerciseActive(newExercise);
+
+    if (trainingActive) {
+      const updateTraining = {
+        ...trainingActive,
+        exercises: [...trainingActive.exercises, newExercise],
+      };
+
+      trainingHook.setTrainingActive(updateTraining);
+      trainingHook.updateData(updateTraining);
+    }
   };
 
   const updateWeightData = (weightValue: string) => {
@@ -74,6 +86,25 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
 
       void updateData(exerciseUpdated);
     }
+  };
+
+  const getIndexLastExercise = () => {
+    const trainingExercises = trainingHook.trainingActive?.exercises;
+    const currentExerciseId = trainingHook.exerciseActive?.id;
+
+    if (trainingExercises) {
+      return trainingExercises.findIndex(
+        (trainingExerciseItem) => trainingExerciseItem.id === currentExerciseId,
+      );
+    }
+
+    return -1;
+  };
+
+  const canBackExercise = () => {
+    const isFirstExercise = exercisesList[0]?.id === trainingHook.exerciseActive?.id;
+
+    return !exercisesList || !exercisesList[0] || isFirstExercise;
   };
 
   const handlePressOpenFinish = () => {
@@ -135,24 +166,21 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   };
 
   const handlePressNavigateNext = () => {
-    createExercise();
-
+    const indexLastExercise = getIndexLastExercise();
     const trainingActive = trainingHook.trainingActive;
-    const exerciseActive = trainingHook.exerciseActive;
 
-    if (trainingActive && exerciseActive) {
-      const updateTraining = {
-        ...trainingActive,
-        exercises: [...trainingActive.exercises, exerciseActive],
-      };
+    if (!trainingActive) return;
 
-      trainingHook.setTrainingActive(updateTraining);
-      trainingHook.updateData(updateTraining);
+    if (indexLastExercise === trainingActive.exercises.length - 1) {
+      void createExercise();
 
       setRepetitionValue(null);
-
       navigation.push("Workout");
+
+      return;
     }
+
+    trainingHook.setExerciseActive(trainingActive.exercises[indexLastExercise + 1]);
   };
 
   const handlePressNavigateBack = () => {
@@ -168,6 +196,12 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       return currentRepetitionValue ? currentRepetitionValue + 1 : 1;
     });
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      setExercisesList(trainingHook.trainingActive?.exercises || []);
+    }, [trainingHook.trainingActive]),
+  );
 
   return (
     <Box
@@ -254,11 +288,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
 
           <HStack justifyContent={"center"}>
             <ExerciseNavigation
-              leftIconDisabled={
-                !exercisesList ||
-                !exercisesList[0] ||
-                exercisesList[0].id === trainingHook.exerciseActive?.id
-              }
+              leftIconDisabled={canBackExercise()}
               onPressLeft={handlePressNavigateBack}
               onPressRight={handlePressNavigateNext}
             />
