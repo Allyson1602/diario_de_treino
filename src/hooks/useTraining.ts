@@ -102,7 +102,7 @@ export const useTraining = (): IUseTraining => {
       id: trainingUuid,
       name: await generateTrainingName(),
       exercises: [],
-      createdDate: moment().format("MM-DD-YYYY"),
+      createdDate: moment().format(),
     };
 
     return newTraining;
@@ -115,7 +115,7 @@ export const useTraining = (): IUseTraining => {
       id: exerciseUuid,
       name: generateExerciseName(),
       muscles: [],
-      createdDate: moment().format("MM-DD-YYYY"),
+      createdDate: moment().format(),
     };
   };
 
