@@ -7,6 +7,7 @@ import { fetchPoppinsFonts } from "../configs/fonts/poppins";
 import { Home } from "../pages/Home";
 import { Training } from "../pages/Training";
 import { Workout } from "../pages/Workout";
+import { HeaderWorkout } from "../components/HeaderWorkout";
 
 export interface RootStackParamList extends ParamListBase {
   Home: undefined;
@@ -46,7 +47,13 @@ export const Navigation: FunctionComponent = () => {
 
   return (
     <NavigationContainer onReady={onLayoutRootView}>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          statusBarTranslucent: true,
+          statusBarStyle: "dark",
+        }}
+      >
         <Stack.Screen
           name="Home"
           component={Home}
@@ -62,7 +69,14 @@ export const Navigation: FunctionComponent = () => {
             headerTransparent: true,
           }}
         />
-        <Stack.Screen name="Workout" component={Workout} />
+        <Stack.Screen
+          name="Workout"
+          component={Workout}
+          options={{
+            header: HeaderWorkout,
+            headerTransparent: true,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

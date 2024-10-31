@@ -1,5 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Crypto from "expo-crypto";
+import moment from "moment";
 import Toast from "react-native-toast-message";
+import { generateOrderAlphabetName } from "../helpers/generateOrderAlphabetName";
 import { IStorageData } from "../interfaces/storageData";
 import { ExerciseModel } from "../models/exercise.model";
 import { TrainingModel } from "../models/training.model";
@@ -15,12 +18,106 @@ interface IUseTraining extends IStorageData<TrainingModel> {
   trainingActive: TrainingModel | null;
   setTrainingActive: (newExercise: TrainingModel | null) => void;
   removeExercise: (exerciseRemove: ExerciseModel) => Promise<boolean>;
+  createExercise: () => ExerciseModel;
+  createTraining: () => Promise<TrainingModel>;
 }
 
 export const useTraining = (): IUseTraining => {
   const exerciseData = useAppSelector((state) => state.exercise.value);
   const trainingData = useAppSelector((state) => state.training.value);
   const dispatch = useAppDispatch();
+
+  const getMoreRecentExercise = (): ExerciseModel | null => {
+    if (trainingData) {
+      let lastExercise: ExerciseModel | null = null;
+
+      trainingData.exercises.forEach((item, index) => {
+        const exerciseDate = moment(item.createdDate);
+        const exerciseBeforeDate = moment(trainingData.exercises[index].createdDate);
+
+        if (moment.max(exerciseDate, exerciseBeforeDate) !== exerciseDate) {
+          lastExercise = trainingData.exercises[index];
+          return;
+        }
+
+        lastExercise = item;
+      });
+
+      return lastExercise;
+    }
+
+    return null;
+  };
+
+  const getMoreRecentTraining = async (): Promise<TrainingModel | null> => {
+    const trainingsStorage = await trainingStorage.getData();
+
+    if (trainingsStorage) {
+      let lastTraining: TrainingModel | null = null;
+
+      trainingsStorage.forEach((item, index) => {
+        const trainingDate = moment(item.createdDate);
+        const trainingBeforeDate = moment(trainingsStorage[index].createdDate);
+
+        if (moment.max(trainingDate, trainingBeforeDate) !== trainingDate) {
+          lastTraining = trainingsStorage[index];
+          return;
+        }
+
+        lastTraining = item;
+      });
+
+      return lastTraining;
+    }
+
+    return null;
+  };
+
+  const generateExerciseName = (): string => {
+    const recentExercise = getMoreRecentExercise();
+    const recentExerciseNameSplit = recentExercise?.name.split(" ");
+
+    const newName = recentExercise?.name
+      ? "Exercício" + (" " + recentExerciseNameSplit?.[recentExerciseNameSplit.length - 1])
+      : "Exercício";
+
+    return generateOrderAlphabetName(newName);
+  };
+
+  const generateTrainingName = async (): Promise<string> => {
+    const recentTraining = await getMoreRecentTraining();
+    const recentTrainingNameSplit = recentTraining?.name.split(" ");
+
+    const newName = recentTraining?.name
+      ? "Treino" + (" " + recentTrainingNameSplit?.[recentTrainingNameSplit.length - 1])
+      : "Treino";
+
+    return generateOrderAlphabetName(newName);
+  };
+
+  const createTraining = async (): Promise<TrainingModel> => {
+    const trainingUuid = Crypto.randomUUID();
+
+    const newTraining: TrainingModel = {
+      id: trainingUuid,
+      name: await generateTrainingName(),
+      exercises: [],
+      createdDate: moment().format(),
+    };
+
+    return newTraining;
+  };
+
+  const createExercise = (): ExerciseModel => {
+    const exerciseUuid = Crypto.randomUUID();
+
+    return {
+      id: exerciseUuid,
+      name: generateExerciseName(),
+      muscles: [],
+      createdDate: moment().format(),
+    };
+  };
 
   const setTrainingActive = (newTraining: TrainingModel | null) => {
     dispatch(setTraining(newTraining));
@@ -72,6 +169,9 @@ export const useTraining = (): IUseTraining => {
     setData: trainingStorage.setData,
     updateData: trainingStorage.updateData,
     removeData: trainingStorage.removeData,
+
+    createTraining,
+    createExercise,
     removeExercise,
 
     trainingActive: trainingData,

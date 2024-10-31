@@ -1,9 +1,10 @@
 export interface ExerciseModel {
-  id: number;
+  id: string;
   name: string;
-  anotation?: string;
+  annotation?: string;
   repetitions?: number;
-  weight?: number;
+  weight?: string;
   timer?: string;
   muscles: string[];
+  createdDate: string;
 }

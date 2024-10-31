@@ -11,7 +11,7 @@ export const LastTrainingDate: FunctionComponent<ILastTrainingDateProps> = (prop
 
   return (
     <Text fontSize={"xs"} color={"text.400"} backgroundColor={"#ff0"}>
-      {moment(props.lastTraining).fromNow()}
+      {props.lastTraining.fromNow()}
     </Text>
   );
 };

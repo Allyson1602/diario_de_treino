@@ -14,9 +14,9 @@ export const MuscleChips: FunctionComponent<IMuscleChipsProps> = (props) => {
       }}
       showsHorizontalScrollIndicator={false}
     >
-      {props.muscleNames.map((muscleName) => (
+      {props.muscleNames.map((muscleName, index) => (
         <Badge
-          key={muscleName}
+          key={muscleName + index}
           rounded={"md"}
           _text={{
             fontSize: "xs",

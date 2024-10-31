@@ -36,9 +36,27 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
     });
   };
 
+  const createExercise = (): void => {
+    const trainingActive = trainingHook.trainingActive;
+    const newExercise = trainingHook.createExercise();
+    trainingHook.setExerciseActive(newExercise);
+
+    if (trainingActive) {
+      const updateTraining = {
+        ...trainingActive,
+        exercises: [...trainingActive.exercises, newExercise],
+      };
+
+      trainingHook.setTrainingActive(updateTraining);
+      trainingHook.updateData(updateTraining);
+    }
+  };
+
   const handlePressNewWorkout = () => {
-    navigation.navigate("Workout");
     defineAnimationOnPress(scaleAddWorkout);
+
+    void createExercise();
+    navigation.navigate("Workout");
   };
 
   const handleRemoveExercise = (exerciseSelected: ExerciseModel) => {
@@ -59,8 +77,11 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
 
     if (firstExercise) {
       trainingHook.setExerciseActive(firstExercise);
-      navigation.navigate("Workout");
+    } else {
+      void createExercise();
     }
+
+    navigation.navigate("Workout");
   };
 
   const handlePressExerciseItem = (exerciseItem: ExerciseModel) => {

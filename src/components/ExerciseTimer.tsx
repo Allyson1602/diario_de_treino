@@ -13,7 +13,7 @@ const MAX_SECONDS = 59;
 
 interface ExerciseTimerProps {
   onChangeTimerValue: (text: string) => void;
-  onPressTimer: () => void;
+  onPressTimer?: () => void;
   onTimerEnd?: () => void;
   containerStyle?: ViewStyle;
   timerValue: string;
@@ -73,7 +73,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
 
     defineTimer();
 
-    props.onPressTimer();
+    props.onPressTimer?.();
   };
 
   const handlePressRestart = () => {

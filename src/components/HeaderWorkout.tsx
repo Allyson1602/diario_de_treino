@@ -5,22 +5,20 @@ import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { HStack, Input, Pressable, Text, useTheme } from "native-base";
 import { FunctionComponent, useCallback, useRef, useState } from "react";
 import { cancelAnimation, useSharedValue, withTiming } from "react-native-reanimated";
-import Toast from "react-native-toast-message";
 import { useTraining } from "../hooks/useTraining";
+import { ExerciseModel } from "../models/exercise.model";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
-const DEFAULT_TRAINING_NAME = "Nome do treino";
+const DEFAULT_EXERCISE_NAME = "Nome do exercício";
 
-export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props) => {
-  const trainingNameInputRef = useRef<HTMLInputElement>(null);
+export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) => {
+  const exerciseNameInputRef = useRef<HTMLInputElement>(null);
   const theme = useTheme();
   const trainingHook = useTraining();
   const scale = useSharedValue(1);
 
   const [isActive, setIsActive] = useState(false);
-  const [trainingNameValue, setTrainingNameValue] = useState(
-    trainingHook.trainingActive?.name || DEFAULT_TRAINING_NAME,
-  );
+  const [exerciseNameValue, setExerciseNameValue] = useState(DEFAULT_EXERCISE_NAME);
 
   const defineGoBackAnimationOnPress = () => {
     cancelAnimation(scale);
@@ -30,61 +28,70 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
     });
   };
 
-  const hasTrainingName = async (newTrainingName: string) => {
-    const trainingsList = await trainingHook.getData();
-
-    return trainingsList.some((trainingItem) => trainingItem.name === newTrainingName);
-  };
-
   const handleGoBack = () => {
     defineGoBackAnimationOnPress();
-    props.navigation.navigate("Home");
+    props.navigation.navigate("Training");
   };
 
   const handlePressText = () => {
     setIsActive(true);
   };
 
-  const handleBlurInput = async () => {
+  const handleBlurInput = () => {
     setIsActive(false);
-
-    const existTrainingName = await hasTrainingName(trainingNameValue);
-
-    if (existTrainingName) {
-      const recoverLastName = trainingHook.trainingActive!.name;
-      setTrainingNameValue(recoverLastName);
-      setIsActive(true);
-
-      Toast.show({
-        type: "error",
-        text1: "Treino 💪",
-        text2: "Esse nome já existe, informe outro.",
-        position: "bottom",
-      });
-      return;
-    }
-
-    trainingHook.setTrainingActive({
-      ...trainingHook.trainingActive!,
-      name: trainingNameValue,
-    });
-
-    trainingHook.updateData({
-      ...trainingHook.trainingActive!,
-      name: trainingNameValue,
-    });
   };
 
   const handleChangeText = (text: string) => {
-    setTrainingNameValue(text);
+    const exerciseActive = trainingHook.exerciseActive;
+
+    if (!exerciseActive) return;
+
+    setExerciseNameValue(text);
+
+    const exerciseUpdated: ExerciseModel = {
+      ...exerciseActive,
+      name: text,
+    };
+
+    const exercisesTraining = trainingHook.trainingActive?.exercises || [];
+
+    const hasExerciseTraining = exercisesTraining.some(({ id }) => id === exerciseUpdated.id);
+    let updateExercisesTraining: ExerciseModel[] = [];
+
+    if (hasExerciseTraining) {
+      updateExercisesTraining = exercisesTraining.map((exerciseItem) => {
+        if (exerciseItem.id === exerciseUpdated.id) {
+          return exerciseUpdated;
+        }
+
+        return exerciseItem;
+      });
+    } else {
+      updateExercisesTraining.push(exerciseUpdated);
+    }
+
+    trainingHook.updateData({
+      ...trainingHook.trainingActive!,
+      exercises: updateExercisesTraining,
+    });
+
+    trainingHook.setExerciseActive(exerciseUpdated);
   };
 
   useFocusEffect(
     useCallback(() => {
       if (isActive) {
-        trainingNameInputRef.current?.focus();
+        exerciseNameInputRef.current?.focus();
       }
     }, [isActive]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (trainingHook.exerciseActive) {
+        setExerciseNameValue(trainingHook.exerciseActive.name);
+      }
+    }, [trainingHook.exerciseActive]),
   );
 
   return (
@@ -101,7 +108,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
         {isActive ? (
           <Input
             selectTextOnFocus
-            value={trainingNameValue}
+            value={exerciseNameValue}
             flex={"1"}
             alignSelf={"center"}
             textAlign={"center"}
@@ -111,7 +118,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
             selectionColor={theme.colors.blue[400]}
             onBlur={handleBlurInput}
             onChangeText={handleChangeText}
-            ref={trainingNameInputRef}
+            ref={exerciseNameInputRef}
             InputRightElement={
               <Feather
                 name="edit-3"
@@ -130,7 +137,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
           <Pressable flex={"1"} onPress={handlePressText}>
             <HStack space={"2"} flex={"1"} justifyContent={"center"} alignItems={"center"}>
               <Text textAlign={"center"} fontSize={"lg"}>
-                {trainingNameValue}
+                {exerciseNameValue}
               </Text>
               <Feather name="edit-3" size={18} color="black" />
             </HStack>
