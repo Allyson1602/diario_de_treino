@@ -18,9 +18,7 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
   const scale = useSharedValue(1);
 
   const [isActive, setIsActive] = useState(false);
-  const [exerciseNameValue, setExerciseNameValue] = useState(
-    trainingHook.exerciseActive?.name || DEFAULT_EXERCISE_NAME,
-  );
+  const [exerciseNameValue, setExerciseNameValue] = useState(DEFAULT_EXERCISE_NAME);
 
   const defineGoBackAnimationOnPress = () => {
     cancelAnimation(scale);
@@ -86,6 +84,14 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
         exerciseNameInputRef.current?.focus();
       }
     }, [isActive]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (trainingHook.exerciseActive) {
+        setExerciseNameValue(trainingHook.exerciseActive.name);
+      }
+    }, [trainingHook.exerciseActive]),
   );
 
   return (

@@ -32,18 +32,51 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
     return musclesList;
   };
 
+  const updateData = (exerciseUpdated: ExerciseModel) => {
+    const exercisesTraining = trainingHook.trainingActive?.exercises || [];
+
+    const updateExercisesTraining = exercisesTraining.map((exerciseItem) => {
+      if (exerciseItem.id === exerciseUpdated.id) {
+        return exerciseUpdated;
+      }
+
+      return exerciseItem;
+    });
+
+    trainingHook.updateData({
+      ...trainingHook.trainingActive!,
+      exercises: updateExercisesTraining,
+    });
+
+    trainingHook.setExerciseActive(exerciseUpdated);
+
+    const trainingExerciseUpdated =
+      trainingHook.trainingActive?.exercises.map((exerciseItem) => {
+        if (exerciseItem.id === exerciseUpdated.id) {
+          return exerciseUpdated;
+        }
+
+        return exerciseItem;
+      }) || [];
+
+    trainingHook.setTrainingActive({
+      ...trainingHook.trainingActive!,
+      exercises: trainingExerciseUpdated,
+    });
+  };
+
   const updateMuscleExercise = (muscleUpdated: string): void => {
-    const exerciseUpdated = trainingHook.exerciseActive;
+    const exerciseActive = trainingHook.exerciseActive;
 
-    if (exerciseUpdated) {
-      let musclesList = toggleMuscleExercise(exerciseUpdated, muscleUpdated);
+    if (exerciseActive) {
+      let musclesList = toggleMuscleExercise(exerciseActive, muscleUpdated);
 
-      const updatedExercise = {
-        ...exerciseUpdated,
+      const updatedExercise: ExerciseModel = {
+        ...exerciseActive,
         muscles: musclesList,
       };
 
-      trainingHook.setExerciseActive(updatedExercise);
+      void updateData(updatedExercise);
     }
   };
 

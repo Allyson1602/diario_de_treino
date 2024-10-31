@@ -40,6 +40,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
 
   const createExercise = async () => {
     const newTraining = await trainingHook.createTraining();
+    const trainingList = await trainingHook.getData();
     const newExercise = trainingHook.createExercise();
 
     trainingHook.setExerciseActive(newExercise);
@@ -51,7 +52,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
       };
 
       trainingHook.setTrainingActive(updateTraining);
-      trainingHook.updateData(updateTraining);
+      trainingHook.setData([...trainingList, updateTraining]);
     }
   };
 
@@ -68,7 +69,6 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      // AsyncStorage.clear();
       listTrainingsByStorage();
     }, []),
   );
