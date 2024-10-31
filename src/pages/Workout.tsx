@@ -303,7 +303,11 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
             <MaterialCommunityIcons
               name="fire"
               size={45}
-              color={true ? theme.colors.primary[500] : theme.colors.muted[400]}
+              color={
+                repetitionValue === trainingHook.exerciseActive?.repetitions
+                  ? theme.colors.primary[500]
+                  : theme.colors.muted[400]
+              }
             />
           }
           onPress={handlePressOpenFinish}
