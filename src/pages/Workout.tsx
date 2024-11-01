@@ -1,6 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Badge, Box, HStack, Text, TextArea, useDisclose, useTheme, VStack } from "native-base";
 import { FunctionComponent, useCallback, useState } from "react";
@@ -24,7 +23,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   const muscleDisclose = useDisclose();
 
   const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
-  const [exercisesList, setExercisesList] = useState<ExerciseModel[]>([]);
 
   const updateData = (exerciseUpdated: ExerciseModel) => {
     const exercisesTraining = trainingHook.trainingActive?.exercises || [];
@@ -101,11 +99,13 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     return -1;
   };
 
-  const canBackExercise = () => {
-    const isFirstExercise = exercisesList[0]?.id === trainingHook.exerciseActive?.id;
+  const canBackExercise = useCallback(() => {
+    const exercisesList = trainingHook.trainingActive?.exercises;
+
+    const isFirstExercise = exercisesList?.[0]?.id === trainingHook.exerciseActive?.id;
 
     return !exercisesList || !exercisesList[0] || isFirstExercise;
-  };
+  }, [trainingHook.exerciseActive]);
 
   const handlePressOpenFinish = () => {
     finishDisclose.onOpen();
@@ -181,10 +181,17 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     }
 
     trainingHook.setExerciseActive(trainingActive.exercises[indexLastExercise + 1]);
+    navigation.push("Workout");
   };
 
   const handlePressNavigateBack = () => {
-    if (navigation.canGoBack()) {
+    const trainingActive = trainingHook.trainingActive;
+    const indexLastExercise = getIndexLastExercise();
+
+    if (trainingActive) {
+      const lastExercise = trainingActive.exercises[indexLastExercise - 1];
+
+      trainingHook.setExerciseActive(lastExercise);
       navigation.goBack();
     }
   };
@@ -196,12 +203,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       return currentRepetitionValue ? currentRepetitionValue + 1 : 1;
     });
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      setExercisesList(trainingHook.trainingActive?.exercises || []);
-    }, [trainingHook.trainingActive]),
-  );
 
   return (
     <Box
