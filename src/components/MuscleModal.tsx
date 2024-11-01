@@ -92,6 +92,9 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
             color: "lightBlue.100",
             size: "xl",
           }}
+          _pressed={{
+            backgroundColor: "transparent",
+          }}
         />
 
         <Modal.Body

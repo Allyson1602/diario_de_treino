@@ -46,6 +46,9 @@ export const FinishTrainingModal: FunctionComponent<IFinishTrainingModal> = ({
             color: "rose.100",
             size: "xl",
           }}
+          _pressed={{
+            backgroundColor: "transparent",
+          }}
         />
 
         <Modal.Body
