@@ -48,7 +48,7 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
       };
 
       trainingHook.setTrainingActive(updateTraining);
-      trainingHook.updateData(updateTraining);
+      trainingHook.updateStorageData(updateTraining);
     }
   };
 
@@ -90,7 +90,7 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
   };
 
   const handleDeleteTraining = () => {
-    trainingHook.removeData(trainingHook.trainingActive!).then((status) => {
+    trainingHook.removeStorageData(trainingHook.trainingActive!).then((status) => {
       if (status) {
         trainingHook.setTrainingActive(null);
         navigation.navigate("Home");

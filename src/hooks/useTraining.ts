@@ -23,20 +23,20 @@ interface IUseTraining extends IStorageData<TrainingModel> {
 }
 
 export const useTraining = (): IUseTraining => {
-  const exerciseData = useAppSelector((state) => state.exercise.value);
-  const trainingData = useAppSelector((state) => state.training.value);
+  const exerciseActive = useAppSelector((state) => state.exercise.value);
+  const trainingActive = useAppSelector((state) => state.training.value);
   const dispatch = useAppDispatch();
 
   const getMoreRecentExercise = (): ExerciseModel | null => {
-    if (trainingData) {
+    if (trainingActive) {
       let lastExercise: ExerciseModel | null = null;
 
-      trainingData.exercises.forEach((item, index) => {
+      trainingActive.exercises.forEach((item, index) => {
         const exerciseDate = moment(item.createdDate);
-        const exerciseBeforeDate = moment(trainingData.exercises[index].createdDate);
+        const exerciseBeforeDate = moment(trainingActive.exercises[index].createdDate);
 
         if (moment.max(exerciseDate, exerciseBeforeDate) !== exerciseDate) {
-          lastExercise = trainingData.exercises[index];
+          lastExercise = trainingActive.exercises[index];
           return;
         }
 
@@ -50,7 +50,7 @@ export const useTraining = (): IUseTraining => {
   };
 
   const getMoreRecentTraining = async (): Promise<TrainingModel | null> => {
-    const trainingsStorage = await trainingStorage.getData();
+    const trainingsStorage = await trainingStorage.getStorageData();
 
     if (trainingsStorage) {
       let lastTraining: TrainingModel | null = null;
@@ -129,22 +129,22 @@ export const useTraining = (): IUseTraining => {
   };
 
   const removeExercise = async (exerciseRemove: ExerciseModel) => {
-    const exercisesData = trainingData?.exercises;
+    const exercisesData = trainingActive?.exercises;
 
     if (exercisesData && exercisesData.length > 0) {
       const exercisesFiltered = exercisesData.filter((item) => item.id !== exerciseRemove.id);
 
-      const trainingActive: TrainingModel = {
-        ...trainingData,
+      const trainingRemove: TrainingModel = {
+        ...trainingActive,
         exercises: exercisesFiltered,
       };
 
-      setTrainingActive(trainingActive);
+      setTrainingActive(trainingRemove);
 
-      const trainingsStorage = await trainingStorage.getData();
+      const trainingsStorage = await trainingStorage.getStorageData();
       const trainingsUpdated: TrainingModel[] = trainingsStorage.map((trainingItem) => {
-        if (trainingItem.id === trainingActive.id) {
-          return trainingActive;
+        if (trainingItem.id === trainingRemove.id) {
+          return trainingRemove;
         }
 
         return trainingItem;
@@ -166,19 +166,19 @@ export const useTraining = (): IUseTraining => {
   };
 
   return {
-    getData: trainingStorage.getData,
-    setData: trainingStorage.setData,
-    updateData: trainingStorage.updateData,
-    removeData: trainingStorage.removeData,
+    getStorageData: trainingStorage.getStorageData,
+    setStorageData: trainingStorage.setStorageData,
+    updateStorageData: trainingStorage.updateStorageData,
+    removeStorageData: trainingStorage.removeStorageData,
 
     createTraining,
     createExercise,
     removeExercise,
 
-    trainingActive: trainingData,
+    trainingActive,
     setTrainingActive,
 
-    exerciseActive: exerciseData,
+    exerciseActive,
     setExerciseActive,
   };
 };

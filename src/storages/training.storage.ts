@@ -5,7 +5,7 @@ import { TrainingModel } from "../models/training.model";
 import { StorageKeys } from "./_storageKeys";
 
 class TrainingStorage implements IStorageData<TrainingModel> {
-  async setData(trainingsValue: TrainingModel[]): Promise<void> {
+  async setStorageData(trainingsValue: TrainingModel[]): Promise<void> {
     try {
       const trainingsJson = JSON.stringify(trainingsValue);
       await AsyncStorage.setItem(StorageKeys.TRAINING, trainingsJson);
@@ -18,7 +18,7 @@ class TrainingStorage implements IStorageData<TrainingModel> {
     }
   }
 
-  async getData() {
+  async getStorageData() {
     try {
       const trainingsStringData = await AsyncStorage.getItem(StorageKeys.TRAINING);
 
@@ -48,8 +48,8 @@ class TrainingStorage implements IStorageData<TrainingModel> {
     });
   };
 
-  updateData = async (trainingValue: TrainingModel) => {
-    const trainingsData = await this.getData();
+  updateStorageData = async (trainingValue: TrainingModel) => {
+    const trainingsData = await this.getStorageData();
 
     if (trainingsData) {
       const updateTrainingsData: TrainingModel[] = this.filterUpdatedTrainings(
@@ -70,8 +70,8 @@ class TrainingStorage implements IStorageData<TrainingModel> {
     }
   };
 
-  async removeData(value: TrainingModel): Promise<boolean> {
-    const trainingData = await this.getData();
+  async removeStorageData(value: TrainingModel): Promise<boolean> {
+    const trainingData = await this.getStorageData();
 
     if (trainingData && trainingData.length > 0) {
       const trainingFiltered = trainingData.filter((item) => item.id !== value.id);

@@ -31,7 +31,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
   };
 
   const hasTrainingName = async (newTrainingName: string) => {
-    const trainingsList = await trainingHook.getData();
+    const trainingsList = await trainingHook.getStorageData();
 
     return trainingsList.some((trainingItem) => trainingItem.name === newTrainingName);
   };
@@ -69,7 +69,7 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
       name: trainingNameValue,
     });
 
-    trainingHook.updateData({
+    trainingHook.updateStorageData({
       ...trainingHook.trainingActive!,
       name: trainingNameValue,
     });

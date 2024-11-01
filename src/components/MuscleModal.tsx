@@ -32,7 +32,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
     return musclesList;
   };
 
-  const updateData = (exerciseUpdated: ExerciseModel) => {
+  const updateStorageData = (exerciseUpdated: ExerciseModel) => {
     const exercisesTraining = trainingHook.trainingActive?.exercises || [];
 
     const updateExercisesTraining = exercisesTraining.map((exerciseItem) => {
@@ -43,7 +43,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
       return exerciseItem;
     });
 
-    trainingHook.updateData({
+    trainingHook.updateStorageData({
       ...trainingHook.trainingActive!,
       exercises: updateExercisesTraining,
     });
@@ -76,7 +76,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
         muscles: musclesList,
       };
 
-      void updateData(updatedExercise);
+      void updateStorageData(updatedExercise);
     }
   };
 

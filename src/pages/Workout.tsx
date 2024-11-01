@@ -24,7 +24,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
 
   const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
 
-  const updateData = (exerciseUpdated: ExerciseModel) => {
+  const updateStorageData = (exerciseUpdated: ExerciseModel) => {
     const exercisesTraining = trainingHook.trainingActive?.exercises || [];
 
     const updateExercisesTraining = exercisesTraining.map((exerciseItem) => {
@@ -35,7 +35,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       return exerciseItem;
     });
 
-    trainingHook.updateData({
+    trainingHook.updateStorageData({
       ...trainingHook.trainingActive!,
       exercises: updateExercisesTraining,
     });
@@ -52,7 +52,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         repetitions: repetitionValue || 0,
       };
 
-      void updateData(exerciseUpdated);
+      void updateStorageData(exerciseUpdated);
     }
   };
 
@@ -69,7 +69,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       trainingHook.setTrainingActive(updateTraining);
-      trainingHook.updateData(updateTraining);
+      trainingHook.updateStorageData(updateTraining);
     }
   };
 
@@ -82,7 +82,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         weight: weightValue,
       };
 
-      void updateData(exerciseUpdated);
+      void updateStorageData(exerciseUpdated);
     }
   };
 
@@ -124,7 +124,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         annotation: text,
       };
 
-      void updateData(exerciseUpdated);
+      void updateStorageData(exerciseUpdated);
     }
   };
 
@@ -161,7 +161,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         timer: timerValue,
       };
 
-      void updateData(exerciseUpdated);
+      void updateStorageData(exerciseUpdated);
     }
   };
 

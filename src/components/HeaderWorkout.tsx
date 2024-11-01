@@ -70,7 +70,7 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
       updateExercisesTraining.push(exerciseUpdated);
     }
 
-    trainingHook.updateData({
+    trainingHook.updateStorageData({
       ...trainingHook.trainingActive!,
       exercises: updateExercisesTraining,
     });

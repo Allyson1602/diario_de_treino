@@ -26,7 +26,7 @@ export const FinishTrainingModal: FunctionComponent<IFinishTrainingModal> = ({
     if (trainingActive) {
       trainingActive.lastTraining = moment().format();
 
-      trainingHook.updateData({ ...trainingActive });
+      trainingHook.updateStorageData({ ...trainingActive });
     }
   };
 
