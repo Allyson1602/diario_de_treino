@@ -103,6 +103,7 @@ export const useTraining = (): IUseTraining => {
       name: await generateTrainingName(),
       exercises: [],
       createdDate: moment().format(),
+      lastTraining: moment().format(),
     };
 
     return newTraining;

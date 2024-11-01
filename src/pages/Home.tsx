@@ -110,7 +110,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
                     <HStack justifyContent={"space-between"} space={"4"}>
                       <Card.Title text={trainingItem.name} />
 
-                      <Card.LastTrainingDate lastTraining={moment(trainingItem.createdDate)} />
+                      <Card.LastTrainingDate lastTraining={moment(trainingItem.lastTraining)} />
                     </HStack>
 
                     <Card.MuscleChips muscleNames={getAllMuscleTraining(trainingItem.exercises)} />
