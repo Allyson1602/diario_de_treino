@@ -43,16 +43,18 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     trainingHook.setExerciseActive(exerciseUpdated);
   };
 
-  const updateRepetitionsData = (repetitionValue: number | null) => {
+  const updateRepetitionsData = (repetitionNumberValue: number | null) => {
     const exerciseActive = trainingHook.exerciseActive;
 
     if (exerciseActive) {
       const exerciseUpdated: ExerciseModel = {
         ...exerciseActive,
-        repetitions: repetitionValue || 0,
+        repetitions: repetitionNumberValue || 0,
       };
 
-      void updateStorageData(exerciseUpdated);
+      requestAnimationFrame(() => {
+        void updateStorageData(exerciseUpdated);
+      });
     }
   };
 
@@ -128,16 +130,16 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     }
   };
 
-  const handleChangeMaxRepetition = (repetitionValue: number | null) => {
-    void updateRepetitionsData(repetitionValue);
+  const handleChangeMaxRepetition = (repetitionNumberValue: number | null) => {
+    void updateRepetitionsData(repetitionNumberValue);
   };
 
-  const handlePressDownMaxRepetition = (repetitionValue: number | null) => {
-    void updateRepetitionsData(repetitionValue);
+  const handlePressDownMaxRepetition = (repetitionNumberValue: number | null) => {
+    void updateRepetitionsData(repetitionNumberValue);
   };
 
-  const handlePressUpMaxRepetition = (repetitionValue: number | null) => {
-    void updateRepetitionsData(repetitionValue);
+  const handlePressUpMaxRepetition = (repetitionNumberValue: number | null) => {
+    void updateRepetitionsData(repetitionNumberValue);
   };
 
   const handleChangeWeight = (weightValue: string) => {
