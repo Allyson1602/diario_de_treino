@@ -1,19 +1,25 @@
 import { Badge, Pressable } from "native-base";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 
 interface ChipProps {
   text: string;
-  active: boolean;
+  isActive: boolean;
   onPress: () => void;
 }
 
-export const Chip: FunctionComponent<ChipProps> = ({ active = false, ...props }) => {
+export const Chip: FunctionComponent<ChipProps> = ({ isActive, ...props }) => {
+  const [active, setActive] = useState(false);
+
   const handlePressChip = () => {
     props.onPress();
   };
 
+  useEffect(() => {
+    setActive(isActive);
+  }, [isActive]);
+
   return (
-    <Pressable onPress={handlePressChip}>
+    <Pressable onPressIn={() => setActive(!active)} onPress={handlePressChip}>
       <Badge
         borderColor={"white"}
         variant={active ? "outline" : "solid"}

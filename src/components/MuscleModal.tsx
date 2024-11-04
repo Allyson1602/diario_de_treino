@@ -1,5 +1,6 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { HStack, Modal, Text, useTheme, VStack } from "native-base";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useCallback, useState } from "react";
 import { muscleGroups } from "../data/muscleGroups";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
@@ -14,12 +15,14 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
   const theme = useTheme();
   const trainingHook = useTraining();
 
+  const [musclesSelected, setMusclesSelected] = useState<string[]>([]);
+
   const checkMuscle = (musclesList: string[], muscleUpdated: string) => {
     return musclesList.some((muscleItem) => muscleItem === muscleUpdated);
   };
 
-  const toggleMuscleExercise = (exerciseActive: ExerciseModel, muscleUpdated: string): string[] => {
-    let musclesList = [...exerciseActive.muscles];
+  const toggleMuscleExercise = (muscleUpdated: string): string[] => {
+    let musclesList = [...musclesSelected];
 
     const hasMuscle = checkMuscle(musclesList, muscleUpdated);
 
@@ -33,9 +36,9 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
   };
 
   const updateStorageData = (exerciseUpdated: ExerciseModel) => {
-    const exercisesTraining = trainingHook.trainingActive?.exercises || [];
+    let exercisesTraining = trainingHook.trainingActive?.exercises || [];
 
-    const updateExercisesTraining = exercisesTraining.map((exerciseItem) => {
+    exercisesTraining = exercisesTraining.map((exerciseItem) => {
       if (exerciseItem.id === exerciseUpdated.id) {
         return exerciseUpdated;
       }
@@ -43,49 +46,52 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
       return exerciseItem;
     });
 
-    trainingHook.updateStorageData({
-      ...trainingHook.trainingActive!,
-      exercises: updateExercisesTraining,
-    });
-
     trainingHook.setExerciseActive(exerciseUpdated);
-
-    const trainingExerciseUpdated =
-      trainingHook.trainingActive?.exercises.map((exerciseItem) => {
-        if (exerciseItem.id === exerciseUpdated.id) {
-          return exerciseUpdated;
-        }
-
-        return exerciseItem;
-      }) || [];
 
     trainingHook.setTrainingActive({
       ...trainingHook.trainingActive!,
-      exercises: trainingExerciseUpdated,
+      exercises: exercisesTraining,
+    });
+
+    trainingHook.updateStorageData({
+      ...trainingHook.trainingActive!,
+      exercises: exercisesTraining,
     });
   };
 
-  const updateMuscleExercise = (muscleUpdated: string): void => {
+  const updateMuscleExercise = (): void => {
     const exerciseActive = trainingHook.exerciseActive;
 
     if (exerciseActive) {
-      let musclesList = toggleMuscleExercise(exerciseActive, muscleUpdated);
-
       const updatedExercise: ExerciseModel = {
         ...exerciseActive,
-        muscles: musclesList,
+        muscles: musclesSelected,
       };
 
       void updateStorageData(updatedExercise);
     }
   };
 
-  const handlePressMuscleChip = (muscleUpdated: string) => {
-    updateMuscleExercise(muscleUpdated);
+  const handleCloseModal = () => {
+    onClose();
+
+    requestAnimationFrame(() => {
+      updateMuscleExercise();
+    });
   };
 
+  const handlePressMuscleChip = (muscleUpdated: string) => {
+    setMusclesSelected(toggleMuscleExercise(muscleUpdated));
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      setMusclesSelected(trainingHook.exerciseActive?.muscles || []);
+    }, [trainingHook.exerciseActive?.muscles]),
+  );
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} px={"6"}>
+    <Modal isOpen={isOpen} onClose={handleCloseModal} px={"6"}>
       <Modal.Content borderRadius={22} width={"full"}>
         <Modal.CloseButton
           _icon={{
@@ -133,11 +139,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
                     return (
                       <Chip
                         key={mainMuscleItem}
-                        active={
-                          trainingHook.exerciseActive?.muscles.includes(mainMuscleItem)
-                            ? true
-                            : false
-                        }
+                        isActive={musclesSelected.includes(mainMuscleItem) ? true : false}
                         text={mainMuscleItem}
                         onPress={() => handlePressMuscleChip(mainMuscleItem)}
                       />
