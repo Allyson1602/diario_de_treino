@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Badge, Box, HStack, Text, TextArea, useDisclose, useTheme, VStack } from "native-base";
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import { ExerciseNavigation } from "../components/ExerciseNavigation";
 import { ExerciseTimer } from "../components/ExerciseTimer";
 import { FinishTrainingModal } from "../components/FinishTrainingModal";
@@ -13,6 +13,14 @@ import { WeightInput } from "../components/WeightInput";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
 import { RootStackParamList } from "../navigation";
+import { useAppDispatch } from "../redux/hooks";
+import {
+  setAnnotationExercise,
+  setRepetitionsExercise,
+  setTimerExercise,
+  setWeightExercise,
+} from "../redux/slices/exerciseSlice";
+import { setExercise as setTrainingExercise } from "../redux/slices/trainingSlice";
 
 type WorkoutProps = NativeStackScreenProps<RootStackParamList, "Workout", "RootStack">;
 
@@ -21,6 +29,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   const trainingHook = useTraining();
   const finishDisclose = useDisclose();
   const muscleDisclose = useDisclose();
+  const dispatch = useAppDispatch();
 
   const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
 
@@ -40,7 +49,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       exercises: updateExercisesTraining,
     });
 
-    trainingHook.setExerciseActive(exerciseUpdated);
+    dispatch(setTrainingExercise(exerciseUpdated));
   };
 
   const updateRepetitionsData = (repetitionNumberValue: number | null) => {
@@ -53,8 +62,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       requestAnimationFrame(() => {
-        void updateStorageData(exerciseUpdated);
+        dispatch(setRepetitionsExercise(repetitionNumberValue || undefined));
       });
+      void updateStorageData(exerciseUpdated);
     }
   };
 
@@ -84,6 +94,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         weight: weightValue,
       };
 
+      requestAnimationFrame(() => {
+        dispatch(setWeightExercise(weightValue));
+      });
       void updateStorageData(exerciseUpdated);
     }
   };
@@ -101,13 +114,13 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     return -1;
   };
 
-  const canBackExercise = useCallback(() => {
+  const canBackExercise = () => {
     const exercisesList = trainingHook.trainingActive?.exercises;
 
     const isFirstExercise = exercisesList?.[0]?.id === trainingHook.exerciseActive?.id;
 
     return !exercisesList || !exercisesList[0] || isFirstExercise;
-  }, [trainingHook.exerciseActive]);
+  };
 
   const handlePressOpenFinish = () => {
     finishDisclose.onOpen();
@@ -126,6 +139,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         annotation: text,
       };
 
+      requestAnimationFrame(() => {
+        dispatch(setAnnotationExercise(text));
+      });
       void updateStorageData(exerciseUpdated);
     }
   };
@@ -163,6 +179,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         timer: timerValue,
       };
 
+      requestAnimationFrame(() => {
+        dispatch(setTimerExercise(timerValue));
+      });
       void updateStorageData(exerciseUpdated);
     }
   };

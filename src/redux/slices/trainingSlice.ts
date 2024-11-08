@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TrainingModel } from "../../models/training.model";
 import { ExerciseModel } from "../../models/exercise.model";
+import { TrainingModel } from "../../models/training.model";
 
 interface TrainingState {
   value: TrainingModel | null;
@@ -17,22 +17,17 @@ const trainingSlice = createSlice({
     setTraining: (state, action: PayloadAction<TrainingModel | null>) => {
       state.value = action.payload;
     },
-    setExercise: (state, action: PayloadAction<ExerciseModel | null>) => {
+    setExercise: (state, action: PayloadAction<ExerciseModel>) => {
       let trainingExercises = state.value?.exercises || [];
 
-      if (trainingExercises.length > 0) {
-        trainingExercises = trainingExercises.map((trainingExerciseItem) => {
-          if (trainingExerciseItem.id === action.payload?.id) return action.payload;
+      const trainingExerciseIndex = trainingExercises.findIndex(
+        (exerciseItem) => exerciseItem.id === action.payload.id,
+      );
 
-          return trainingExerciseItem;
-        });
-      }
+      trainingExercises[trainingExerciseIndex] = action.payload;
 
       if (state.value) {
-        state.value = {
-          ...state.value,
-          exercises: trainingExercises,
-        };
+        state.value.exercises = trainingExercises;
       }
     },
   },
