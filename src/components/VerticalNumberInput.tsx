@@ -1,9 +1,10 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Icon, Input, useTheme, VStack } from "native-base";
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { GestureResponderEvent, TouchableOpacity } from "react-native";
 import { isNumber } from "../utils/isNumber";
 import { onlyPositiveNumber } from "../utils/onlyPositiveNumber";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const MAX_INPUT_VALUE = 99;
 const MIN_INPUT_VALUE = 0;
@@ -17,6 +18,8 @@ interface VerticalNumberInputProps {
 
 export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = (props) => {
   const theme = useTheme();
+
+  const [inputValue, setInputValue] = useState<number | null>();
 
   const defineMaxNumberValue = (numberValue: number | null) => {
     if (!numberValue) return null;
@@ -37,39 +40,48 @@ export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = 
     newValue = onlyPositiveNumber(newValue);
     newValue = defineMaxNumberValue(newValue);
 
+    setInputValue(newValue);
     props.onChangeInput?.(newValue);
   };
 
   const handlePressCaretUp = (event: GestureResponderEvent) => {
-    let newValue = isNumber(props.value);
+    let newValue = isNumber(inputValue);
     newValue = onlyPositiveNumber(newValue);
 
     const incrementValue = newValue ? newValue + 1 : 1;
 
+    setInputValue(incrementValue);
     props.onPressCaretUp?.(incrementValue);
   };
 
   const handlePressCaretDown = (event: GestureResponderEvent) => {
-    let newValue = isNumber(props.value);
+    let newValue = isNumber(inputValue);
     newValue = onlyPositiveNumber(newValue);
 
     const decrementValue = newValue ? newValue - 1 : 0;
 
+    setInputValue(decrementValue);
     props.onPressCaretDown?.(decrementValue);
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      setInputValue(props.value);
+    }, [props.value]),
+  );
 
   return (
     <VStack justifyContent={"center"} alignItems={"center"}>
       <TouchableOpacity
         onPress={(event) => handlePressCaretUp(event)}
-        disabled={props.value === MAX_INPUT_VALUE}
+        disabled={inputValue === MAX_INPUT_VALUE}
       >
         <Icon
           as={FontAwesome}
           name="caret-up"
           size={50}
           textAlign="center"
-          color={props.value === MAX_INPUT_VALUE ? "muted.400" : "primary.500"}
+          color={inputValue === MAX_INPUT_VALUE ? "muted.400" : "primary.500"}
         />
       </TouchableOpacity>
 
@@ -96,20 +108,20 @@ export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = 
         textAlignVertical="bottom"
         width={"60"}
         height={"16"}
-        value={props.value?.toString() || undefined}
+        value={inputValue?.toString() || undefined}
         onChangeText={handleChangeInput}
         selectionColor={theme.colors.blue[400]}
       />
 
       <TouchableOpacity
         onPress={(event) => handlePressCaretDown(event)}
-        disabled={props.value === MIN_INPUT_VALUE}
+        disabled={inputValue === MIN_INPUT_VALUE}
       >
         <Icon
           as={FontAwesome}
           name="caret-down"
           size={50}
-          color={props.value === MIN_INPUT_VALUE ? "muted.400" : "primary.500"}
+          color={inputValue === MIN_INPUT_VALUE ? "muted.400" : "primary.500"}
           textAlign="center"
         />
       </TouchableOpacity>

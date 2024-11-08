@@ -137,6 +137,14 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
           color: "primary.500",
           fontWeight: "medium",
           py: "0",
+          height: 8,
+          maxHeight: 8,
+          selectionColor: theme.colors.blue[400],
+          _focus: {
+            _android: {
+              selectionColor: theme.colors.blue[400],
+            },
+          },
         }}
       />
 

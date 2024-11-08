@@ -1,9 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Badge, Box, HStack, Text, TextArea, useDisclose, useTheme, VStack } from "native-base";
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import { ExerciseNavigation } from "../components/ExerciseNavigation";
 import { ExerciseTimer } from "../components/ExerciseTimer";
 import { FinishTrainingModal } from "../components/FinishTrainingModal";
@@ -14,6 +13,14 @@ import { WeightInput } from "../components/WeightInput";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
 import { RootStackParamList } from "../navigation";
+import { useAppDispatch } from "../redux/hooks";
+import {
+  setAnnotationExercise,
+  setRepetitionsExercise,
+  setTimerExercise,
+  setWeightExercise,
+} from "../redux/slices/exerciseSlice";
+import { setExercise as setTrainingExercise } from "../redux/slices/trainingSlice";
 
 type WorkoutProps = NativeStackScreenProps<RootStackParamList, "Workout", "RootStack">;
 
@@ -22,11 +29,11 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   const trainingHook = useTraining();
   const finishDisclose = useDisclose();
   const muscleDisclose = useDisclose();
+  const dispatch = useAppDispatch();
 
   const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
-  const [exercisesList, setExercisesList] = useState<ExerciseModel[]>([]);
 
-  const updateData = (exerciseUpdated: ExerciseModel) => {
+  const updateStorageData = (exerciseUpdated: ExerciseModel) => {
     const exercisesTraining = trainingHook.trainingActive?.exercises || [];
 
     const updateExercisesTraining = exercisesTraining.map((exerciseItem) => {
@@ -37,24 +44,27 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       return exerciseItem;
     });
 
-    trainingHook.updateData({
+    trainingHook.updateStorageData({
       ...trainingHook.trainingActive!,
       exercises: updateExercisesTraining,
     });
 
-    trainingHook.setExerciseActive(exerciseUpdated);
+    dispatch(setTrainingExercise(exerciseUpdated));
   };
 
-  const updateRepetitionsData = (repetitionValue: number | null) => {
+  const updateRepetitionsData = (repetitionNumberValue: number | null) => {
     const exerciseActive = trainingHook.exerciseActive;
 
     if (exerciseActive) {
       const exerciseUpdated: ExerciseModel = {
         ...exerciseActive,
-        repetitions: repetitionValue || 0,
+        repetitions: repetitionNumberValue || 0,
       };
 
-      void updateData(exerciseUpdated);
+      requestAnimationFrame(() => {
+        dispatch(setRepetitionsExercise(repetitionNumberValue || undefined));
+      });
+      void updateStorageData(exerciseUpdated);
     }
   };
 
@@ -71,7 +81,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       trainingHook.setTrainingActive(updateTraining);
-      trainingHook.updateData(updateTraining);
+      trainingHook.updateStorageData(updateTraining);
     }
   };
 
@@ -84,7 +94,10 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         weight: weightValue,
       };
 
-      void updateData(exerciseUpdated);
+      requestAnimationFrame(() => {
+        dispatch(setWeightExercise(weightValue));
+      });
+      void updateStorageData(exerciseUpdated);
     }
   };
 
@@ -102,7 +115,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   };
 
   const canBackExercise = () => {
-    const isFirstExercise = exercisesList[0]?.id === trainingHook.exerciseActive?.id;
+    const exercisesList = trainingHook.trainingActive?.exercises;
+
+    const isFirstExercise = exercisesList?.[0]?.id === trainingHook.exerciseActive?.id;
 
     return !exercisesList || !exercisesList[0] || isFirstExercise;
   };
@@ -124,20 +139,23 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         annotation: text,
       };
 
-      void updateData(exerciseUpdated);
+      requestAnimationFrame(() => {
+        dispatch(setAnnotationExercise(text));
+      });
+      void updateStorageData(exerciseUpdated);
     }
   };
 
-  const handleChangeMaxRepetition = (repetitionValue: number | null) => {
-    void updateRepetitionsData(repetitionValue);
+  const handleChangeMaxRepetition = (repetitionNumberValue: number | null) => {
+    void updateRepetitionsData(repetitionNumberValue);
   };
 
-  const handlePressDownMaxRepetition = (repetitionValue: number | null) => {
-    void updateRepetitionsData(repetitionValue);
+  const handlePressDownMaxRepetition = (repetitionNumberValue: number | null) => {
+    void updateRepetitionsData(repetitionNumberValue);
   };
 
-  const handlePressUpMaxRepetition = (repetitionValue: number | null) => {
-    void updateRepetitionsData(repetitionValue);
+  const handlePressUpMaxRepetition = (repetitionNumberValue: number | null) => {
+    void updateRepetitionsData(repetitionNumberValue);
   };
 
   const handleChangeWeight = (weightValue: string) => {
@@ -161,7 +179,10 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         timer: timerValue,
       };
 
-      void updateData(exerciseUpdated);
+      requestAnimationFrame(() => {
+        dispatch(setTimerExercise(timerValue));
+      });
+      void updateStorageData(exerciseUpdated);
     }
   };
 
@@ -181,10 +202,17 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     }
 
     trainingHook.setExerciseActive(trainingActive.exercises[indexLastExercise + 1]);
+    navigation.push("Workout");
   };
 
   const handlePressNavigateBack = () => {
-    if (navigation.canGoBack()) {
+    const trainingActive = trainingHook.trainingActive;
+    const indexLastExercise = getIndexLastExercise();
+
+    if (trainingActive) {
+      const lastExercise = trainingActive.exercises[indexLastExercise - 1];
+
+      trainingHook.setExerciseActive(lastExercise);
       navigation.goBack();
     }
   };
@@ -196,12 +224,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       return currentRepetitionValue ? currentRepetitionValue + 1 : 1;
     });
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      setExercisesList(trainingHook.trainingActive?.exercises || []);
-    }, [trainingHook.trainingActive]),
-  );
 
   return (
     <Box

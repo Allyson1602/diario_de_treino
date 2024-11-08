@@ -33,14 +33,14 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   const [trainingsData, setTrainingsData] = useState<TrainingModel[]>([]);
 
   const listTrainingsByStorage = async () => {
-    const trainingsStorage = (await trainingHook.getData()) || [];
+    const trainingsStorage = (await trainingHook.getStorageData()) || [];
 
     setTrainingsData(trainingsStorage);
   };
 
   const createExercise = async () => {
     const newTraining = await trainingHook.createTraining();
-    const trainingList = await trainingHook.getData();
+    const trainingList = await trainingHook.getStorageData();
     const newExercise = trainingHook.createExercise();
 
     trainingHook.setExerciseActive(newExercise);
@@ -52,7 +52,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
       };
 
       trainingHook.setTrainingActive(updateTraining);
-      trainingHook.setData([...trainingList, updateTraining]);
+      trainingHook.setStorageData([...trainingList, updateTraining]);
     }
   };
 
@@ -110,7 +110,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
                     <HStack justifyContent={"space-between"} space={"4"}>
                       <Card.Title text={trainingItem.name} />
 
-                      <Card.LastTrainingDate lastTraining={moment(trainingItem.createdDate)} />
+                      <Card.LastTrainingDate lastTraining={moment(trainingItem.lastTraining)} />
                     </HStack>
 
                     <Card.MuscleChips muscleNames={getAllMuscleTraining(trainingItem.exercises)} />

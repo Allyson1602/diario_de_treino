@@ -13,6 +13,7 @@ export const MuscleChips: FunctionComponent<IMuscleChipsProps> = (props) => {
         gap: 4,
       }}
       showsHorizontalScrollIndicator={false}
+      onStartShouldSetResponder={() => true}
     >
       {props.muscleNames.map((muscleName, index) => (
         <Badge
