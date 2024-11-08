@@ -1,0 +1,33 @@
+import { Badge, ScrollView } from "native-base";
+import { FunctionComponent } from "react";
+
+interface IMuscleChipsProps {
+  muscleNames: string[];
+}
+
+export const MuscleChips: FunctionComponent<IMuscleChipsProps> = (props) => {
+  return (
+    <ScrollView
+      horizontal
+      contentContainerStyle={{
+        gap: 4,
+      }}
+      showsHorizontalScrollIndicator={false}
+      onStartShouldSetResponder={() => true}
+    >
+      {props.muscleNames.map((muscleName, index) => (
+        <Badge
+          key={muscleName + index}
+          rounded={"md"}
+          _text={{
+            fontSize: "xs",
+            color: "text.800",
+          }}
+          backgroundColor={"gray.300"}
+        >
+          {muscleName}
+        </Badge>
+      ))}
+    </ScrollView>
+  );
+};
