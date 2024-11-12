@@ -275,6 +275,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
               onChangeInput={setRepetitionValue}
               onPressCaretDown={setRepetitionValue}
               onPressCaretUp={setRepetitionValue}
+              maxNumber={trainingHook.exerciseActive?.repetitions}
             />
             <Text fontSize={"lg"} color={"text.900"} fontWeight={"medium"}>
               de
