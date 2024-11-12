@@ -3,6 +3,7 @@ import * as Crypto from "expo-crypto";
 import moment from "moment";
 import Toast from "react-native-toast-message";
 import { generateOrderAlphabetName } from "../helpers/generateOrderAlphabetName";
+import { mostDefinedValueRepetitions } from "../helpers/mostDefinedValueRepetitions";
 import { mostDefinedValueTimer } from "../helpers/mostDefinedValueTimer";
 import { IStorageData } from "../interfaces/storageData";
 import { ExerciseModel } from "../models/exercise.model";
@@ -114,12 +115,14 @@ export const useTraining = (): IUseTraining => {
     const trainingsStorage = await trainingStorage.getStorageData();
     const exerciseUuid = Crypto.randomUUID();
     const mostUsedTimer = mostDefinedValueTimer(trainingsStorage);
+    const mostUsedRepetitions = mostDefinedValueRepetitions(trainingsStorage);
 
     return {
       id: exerciseUuid,
       name: generateExerciseName(),
       muscles: [],
       timer: mostUsedTimer,
+      repetitions: mostUsedRepetitions,
       createdDate: moment().format(),
     };
   };
