@@ -36,9 +36,9 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
     });
   };
 
-  const createExercise = (): void => {
+  const createExercise = async () => {
     const trainingActive = trainingHook.trainingActive;
-    const newExercise = trainingHook.createExercise();
+    const newExercise = await trainingHook.createExercise();
     trainingHook.setExerciseActive(newExercise);
 
     if (trainingActive) {

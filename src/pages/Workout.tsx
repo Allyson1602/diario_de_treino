@@ -68,9 +68,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     }
   };
 
-  const createExercise = (): void => {
+  const createExercise = async () => {
     const trainingActive = trainingHook.trainingActive;
-    const newExercise = trainingHook.createExercise();
+    const newExercise = await trainingHook.createExercise();
 
     trainingHook.setExerciseActive(newExercise);
 
