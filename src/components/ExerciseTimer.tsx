@@ -38,13 +38,20 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
     let updateTimer = timerValue;
     setToggleTimer(true);
 
+    const startDate = moment().add(1, "second");
+
+    if (timerInterval) clearInterval(timerInterval);
+
     const newInterval = setInterval(() => {
       if (timerInterval) return;
 
-      const subtractTimer = moment(updateTimer, "m:ss").subtract(1, "seconds");
+      const elapsedTime = moment().diff(startDate, "milliseconds");
+      const remainingTime = moment.duration(
+        moment(updateTimer, "m:ss").diff(elapsedTime, "milliseconds"),
+      );
 
-      updateTimer = subtractTimer.format("m:ss");
-      setTimerValue(updateTimer);
+      const formattedTime = moment.utc(remainingTime.asMilliseconds()).format("m:ss");
+      setTimerValue(formattedTime);
     }, 1000);
 
     setTimerInterval(newInterval);
