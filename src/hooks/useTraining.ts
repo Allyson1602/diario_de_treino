@@ -3,6 +3,8 @@ import * as Crypto from "expo-crypto";
 import moment from "moment";
 import Toast from "react-native-toast-message";
 import { generateOrderAlphabetName } from "../helpers/generateOrderAlphabetName";
+import { mostDefinedValueRepetitions } from "../helpers/mostDefinedValueRepetitions";
+import { mostDefinedValueTimer } from "../helpers/mostDefinedValueTimer";
 import { IStorageData } from "../interfaces/storageData";
 import { ExerciseModel } from "../models/exercise.model";
 import { TrainingModel } from "../models/training.model";
@@ -18,7 +20,7 @@ interface IUseTraining extends IStorageData<TrainingModel> {
   trainingActive: TrainingModel | null;
   setTrainingActive: (newExercise: TrainingModel | null) => void;
   removeExercise: (exerciseRemove: ExerciseModel) => Promise<boolean>;
-  createExercise: () => ExerciseModel;
+  createExercise: () => Promise<ExerciseModel>;
   createTraining: () => Promise<TrainingModel>;
 }
 
@@ -109,13 +111,18 @@ export const useTraining = (): IUseTraining => {
     return newTraining;
   };
 
-  const createExercise = (): ExerciseModel => {
+  const createExercise = async (): Promise<ExerciseModel> => {
+    const trainingsStorage = await trainingStorage.getStorageData();
     const exerciseUuid = Crypto.randomUUID();
+    const mostUsedTimer = mostDefinedValueTimer(trainingsStorage);
+    const mostUsedRepetitions = mostDefinedValueRepetitions(trainingsStorage);
 
     return {
       id: exerciseUuid,
       name: generateExerciseName(),
       muscles: [],
+      timer: mostUsedTimer,
+      repetitions: mostUsedRepetitions,
       createdDate: moment().format(),
     };
   };

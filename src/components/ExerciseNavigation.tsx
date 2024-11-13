@@ -1,5 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
-import { HStack, useTheme } from "native-base";
+import { Box, HStack, useTheme } from "native-base";
 import { FunctionComponent } from "react";
 import { cancelAnimation, SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { CustomAnimated } from "./ui/CustomAnimated";
@@ -7,6 +7,7 @@ import { CustomAnimated } from "./ui/CustomAnimated";
 interface ExerciseNavigationProps {
   leftIconDisabled?: boolean;
   rightIconDisabled?: boolean;
+  isLastExercise?: boolean;
   onPressLeft: () => void;
   onPressRight: () => void;
 }
@@ -49,16 +50,46 @@ export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (p
         }}
       />
 
-      <CustomAnimated.IconButton
-        onPress={handlePressRight}
-        rounded={"full"}
-        isDisabled={props.rightIconDisabled}
-        style={{ transform: [{ scale: scaleRight }] }}
-        icon={<Feather name="corner-up-right" size={50} color={theme.colors.primary[500]} />}
-        _pressed={{
-          backgroundColor: "transparent",
-        }}
-      />
+      <Box position={"relative"}>
+        <CustomAnimated.IconButton
+          onPress={handlePressRight}
+          rounded={"full"}
+          isDisabled={props.rightIconDisabled}
+          style={{ transform: [{ scale: scaleRight }] }}
+          icon={
+            <Feather
+              name="corner-up-right"
+              size={50}
+              color={props.isLastExercise ? theme.colors.green[600] : theme.colors.primary[500]}
+            />
+          }
+          _pressed={{
+            backgroundColor: "transparent",
+          }}
+        />
+
+        {props.isLastExercise && (
+          <CustomAnimated.IconButton
+            onPress={handlePressRight}
+            rounded={"full"}
+            isDisabled={props.rightIconDisabled}
+            style={{ transform: [{ scale: scaleRight }] }}
+            icon={
+              <Feather
+                name="plus"
+                size={24}
+                color={props.isLastExercise ? theme.colors.green[600] : theme.colors.primary[500]}
+              />
+            }
+            _pressed={{
+              backgroundColor: "transparent",
+            }}
+            position={"absolute"}
+            bottom={"0"}
+            right={"-6"}
+          />
+        )}
+      </Box>
     </HStack>
   );
 };

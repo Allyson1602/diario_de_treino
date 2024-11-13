@@ -11,7 +11,7 @@ import { store } from "../redux/store";
 export const Layout: FunctionComponent = () => {
   return (
     <>
-      <StatusBar style="dark" animated />
+      <StatusBar style="dark" animated translucent />
 
       <NativeBaseProvider theme={theme} config={nativeBaseConfig}>
         <Provider store={store}>

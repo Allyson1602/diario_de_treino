@@ -41,7 +41,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   const createExercise = async () => {
     const newTraining = await trainingHook.createTraining();
     const trainingList = await trainingHook.getStorageData();
-    const newExercise = trainingHook.createExercise();
+    const newExercise = await trainingHook.createExercise();
 
     trainingHook.setExerciseActive(newExercise);
 
