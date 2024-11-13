@@ -2,7 +2,7 @@
   "expo": {
     "name": "Diário de treino",
     "slug": "diario_de_treino",
-    "version": "1.0.1",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
@@ -24,10 +24,7 @@
     "web": {
       "favicon": "./assets/images/icon.png"
     },
-    "plugins": [
-      "expo-font",
-      "expo-build-properties"
-    ],
+    "plugins": ["expo-font", "expo-build-properties"],
     "extra": {
       "eas": {
         "projectId": "3e886444-d3eb-4695-9b6b-ed4a417fcfbb"
