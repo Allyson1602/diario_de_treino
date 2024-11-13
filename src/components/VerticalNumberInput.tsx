@@ -1,10 +1,10 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useFocusEffect } from "@react-navigation/native";
 import { Icon, Input, useTheme, VStack } from "native-base";
 import React, { FunctionComponent, useCallback, useState } from "react";
 import { GestureResponderEvent, TouchableOpacity } from "react-native";
 import { isNumber } from "../utils/isNumber";
 import { onlyPositiveNumber } from "../utils/onlyPositiveNumber";
-import { useFocusEffect } from "@react-navigation/native";
 
 export const MAX_INPUT_VALUE = 99;
 const MIN_INPUT_VALUE = 0;
@@ -14,6 +14,7 @@ interface VerticalNumberInputProps {
   onPressCaretDown?: (newValue: number | null) => void;
   onChangeInput?: (value: number | null) => void;
   value?: number | null;
+  maxNumber?: number;
 }
 
 export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = (props) => {
@@ -40,6 +41,12 @@ export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = 
     newValue = onlyPositiveNumber(newValue);
     newValue = defineMaxNumberValue(newValue);
 
+    if (newValue && props.maxNumber && newValue >= props.maxNumber) {
+      setInputValue(props.maxNumber);
+      props.onChangeInput?.(props.maxNumber);
+      return;
+    }
+
     setInputValue(newValue);
     props.onChangeInput?.(newValue);
   };
@@ -49,6 +56,12 @@ export const VerticalNumberInput: FunctionComponent<VerticalNumberInputProps> = 
     newValue = onlyPositiveNumber(newValue);
 
     const incrementValue = newValue ? newValue + 1 : 1;
+
+    if (incrementValue && props.maxNumber && incrementValue >= props.maxNumber) {
+      setInputValue(props.maxNumber);
+      props.onChangeInput?.(props.maxNumber);
+      return;
+    }
 
     setInputValue(incrementValue);
     props.onPressCaretUp?.(incrementValue);

@@ -8,7 +8,7 @@ import { ExerciseTimer } from "../components/ExerciseTimer";
 import { FinishTrainingModal } from "../components/FinishTrainingModal";
 import { MuscleModal } from "../components/MuscleModal";
 import { CustomAnimated } from "../components/ui/CustomAnimated";
-import { MAX_INPUT_VALUE, VerticalNumberInput } from "../components/VerticalNumberInput";
+import { VerticalNumberInput } from "../components/VerticalNumberInput";
 import { WeightInput } from "../components/WeightInput";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
@@ -68,9 +68,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     }
   };
 
-  const createExercise = (): void => {
+  const createExercise = async () => {
     const trainingActive = trainingHook.trainingActive;
-    const newExercise = trainingHook.createExercise();
+    const newExercise = await trainingHook.createExercise();
 
     trainingHook.setExerciseActive(newExercise);
 
@@ -120,6 +120,15 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     const isFirstExercise = exercisesList?.[0]?.id === trainingHook.exerciseActive?.id;
 
     return !exercisesList || !exercisesList[0] || isFirstExercise;
+  };
+
+  const isLastExercise = (): boolean => {
+    const indexLastExercise = getIndexLastExercise();
+    const trainingActive = trainingHook.trainingActive;
+
+    if (trainingActive && indexLastExercise === trainingActive.exercises.length - 1) return true;
+
+    return false;
   };
 
   const handlePressOpenFinish = () => {
@@ -192,16 +201,13 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
 
     if (!trainingActive) return;
 
-    if (indexLastExercise === trainingActive.exercises.length - 1) {
+    if (isLastExercise()) {
       void createExercise();
-
       setRepetitionValue(null);
-      navigation.push("Workout");
-
-      return;
+    } else {
+      trainingHook.setExerciseActive(trainingActive.exercises[indexLastExercise + 1]);
     }
 
-    trainingHook.setExerciseActive(trainingActive.exercises[indexLastExercise + 1]);
     navigation.push("Workout");
   };
 
@@ -215,14 +221,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       trainingHook.setExerciseActive(lastExercise);
       navigation.goBack();
     }
-  };
-
-  const handleTimerEnd = () => {
-    setRepetitionValue((currentRepetitionValue) => {
-      if (currentRepetitionValue === MAX_INPUT_VALUE) return currentRepetitionValue;
-
-      return currentRepetitionValue ? currentRepetitionValue + 1 : 1;
-    });
   };
 
   return (
@@ -275,6 +273,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
               onChangeInput={setRepetitionValue}
               onPressCaretDown={setRepetitionValue}
               onPressCaretUp={setRepetitionValue}
+              maxNumber={trainingHook.exerciseActive?.repetitions}
             />
             <Text fontSize={"lg"} color={"text.900"} fontWeight={"medium"}>
               de
@@ -305,7 +304,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
           <ExerciseTimer
             timerValue={trainingHook.exerciseActive?.timer || "2:00"}
             onChangeTimerValue={handleChangeTimer}
-            onTimerEnd={handleTimerEnd}
           />
 
           <HStack justifyContent={"center"}>
@@ -313,6 +311,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
               leftIconDisabled={canBackExercise()}
               onPressLeft={handlePressNavigateBack}
               onPressRight={handlePressNavigateNext}
+              isLastExercise={isLastExercise()}
             />
           </HStack>
         </VStack>
