@@ -122,6 +122,15 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     return !exercisesList || !exercisesList[0] || isFirstExercise;
   };
 
+  const isLastExercise = (): boolean => {
+    const indexLastExercise = getIndexLastExercise();
+    const trainingActive = trainingHook.trainingActive;
+
+    if (trainingActive && indexLastExercise === trainingActive.exercises.length - 1) return true;
+
+    return false;
+  };
+
   const handlePressOpenFinish = () => {
     finishDisclose.onOpen();
   };
@@ -192,16 +201,13 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
 
     if (!trainingActive) return;
 
-    if (indexLastExercise === trainingActive.exercises.length - 1) {
+    if (isLastExercise()) {
       void createExercise();
-
       setRepetitionValue(null);
-      navigation.push("Workout");
-
-      return;
+    } else {
+      trainingHook.setExerciseActive(trainingActive.exercises[indexLastExercise + 1]);
     }
 
-    trainingHook.setExerciseActive(trainingActive.exercises[indexLastExercise + 1]);
     navigation.push("Workout");
   };
 
@@ -305,6 +311,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
               leftIconDisabled={canBackExercise()}
               onPressLeft={handlePressNavigateBack}
               onPressRight={handlePressNavigateNext}
+              isLastExercise={isLastExercise()}
             />
           </HStack>
         </VStack>

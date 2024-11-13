@@ -23,6 +23,5 @@ export const mostDefinedValueRepetitions = (trainings: TrainingModel[]) => {
     }
   }
 
-  console.log("repetitionsValues", repetitionsValues);
   return Number(mostUsedRepetitions) || 4;
 };
