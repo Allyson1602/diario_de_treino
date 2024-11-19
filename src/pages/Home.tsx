@@ -5,6 +5,7 @@ import {
   Actionsheet,
   Box,
   Button,
+  Center,
   HStack,
   Image,
   Link,
@@ -15,6 +16,7 @@ import {
   VStack,
 } from "native-base";
 import { FunctionComponent, useCallback, useState } from "react";
+import HomeVectorTrainingImage from "../../assets/images/app/home-vector-training.png";
 import QRCodePixImage from "../../assets/images/app/qrcode_pix.png";
 import { Card } from "../components/Card/index";
 import { MotivationPhrases } from "../components/MotivationalPhrases";
@@ -119,15 +121,26 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
               ))}
             </ScrollView>
           ) : (
-            <Text
-              textAlign={"center"}
-              pt={"6"}
-              fontWeight={"light"}
-              fontSize={"md"}
-              color={"text.500"}
-            >
-              Para iniciar, clique em <Text fontWeight={"black"}>Novo Treino</Text>
-            </Text>
+            <VStack flex={1} justifyContent={"space-between"}>
+              <Text
+                textAlign={"center"}
+                pt={"6"}
+                fontWeight={"light"}
+                fontSize={"md"}
+                color={"text.500"}
+              >
+                Para iniciar, clique em <Text fontWeight={"black"}>Novo Treino</Text>
+              </Text>
+
+              <Center flex={"1"}>
+                <Image
+                  source={HomeVectorTrainingImage}
+                  alt="Duas pessoas treinando com halter"
+                  size={"2xl"}
+                  opacity={0.4}
+                />
+              </Center>
+            </VStack>
           )}
         </VStack>
 
