@@ -2,20 +2,24 @@ import Feather from "@expo/vector-icons/Feather";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
-import { HStack, Input, Pressable, Text, useTheme } from "native-base";
-import { FunctionComponent, useCallback, useRef, useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import { Box, HStack, Input, Pressable, Text, useTheme } from "native-base";
+import { FunctionComponent, useCallback, useContext, useRef, useState } from "react";
 import { cancelAnimation, useSharedValue, withTiming } from "react-native-reanimated";
+import Tooltip from "react-native-walkthrough-tooltip";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
+import { WalkthroughContext } from "../redux/walkthrough.context";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
-const DEFAULT_EXERCISE_NAME = "Nome do exercício";
+const DEFAULT_EXERCISE_NAME = "Exercício";
 
 export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) => {
   const exerciseNameInputRef = useRef<HTMLInputElement>(null);
   const theme = useTheme();
   const trainingHook = useTraining();
   const scale = useSharedValue(1);
+  const { currentTooltip, setCurrentTooltip } = useContext(WalkthroughContext);
 
   const [isActive, setIsActive] = useState(false);
   const [exerciseNameValue, setExerciseNameValue] = useState(DEFAULT_EXERCISE_NAME);
@@ -96,6 +100,7 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
 
   return (
     <HStack safeArea p={"4"} alignItems={"center"}>
+      <StatusBar backgroundColor={currentTooltip === "" ? undefined : "#00000080"} />
       <CustomAnimated.IconButton
         icon={<SimpleLineIcons name="arrow-left" size={22} color="black" />}
         onPress={handleGoBack}
@@ -134,14 +139,34 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
             }}
           />
         ) : (
-          <Pressable flex={"1"} onPress={handlePressText}>
-            <HStack space={"2"} flex={"1"} justifyContent={"center"} alignItems={"center"}>
-              <Text textAlign={"center"} fontSize={"lg"}>
-                {exerciseNameValue}
-              </Text>
-              <Feather name="edit-3" size={18} color="black" />
-            </HStack>
-          </Pressable>
+          <Tooltip
+            isVisible={currentTooltip === "exerciseName"}
+            content={
+              <Box>
+                <Text>Crie um nome para seu exercício</Text>
+              </Box>
+            }
+            onClose={() => setCurrentTooltip("muscleGroup")}
+            placement="bottom"
+            topAdjustment={-24}
+          >
+            <Pressable flex={"1"} onPress={handlePressText}>
+              <HStack
+                space={"2"}
+                flex={"1"}
+                justifyContent={"center"}
+                alignItems={"center"}
+                bgColor={currentTooltip === "exerciseName" ? "white:alpha.80" : "transparent"}
+                paddingX={currentTooltip === "exerciseName" ? "4" : "0"}
+                borderRadius={currentTooltip === "exerciseName" ? "2xl" : "none"}
+              >
+                <Text textAlign={"center"} fontSize={"lg"}>
+                  {exerciseNameValue}
+                </Text>
+                <Feather name="edit-3" size={18} color="black" />
+              </HStack>
+            </Pressable>
+          </Tooltip>
         )}
       </HStack>
     </HStack>
