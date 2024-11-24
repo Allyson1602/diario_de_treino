@@ -325,9 +325,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
             <HStack alignItems={"center"} space={"2"}>
               <VerticalNumberInput
                 value={repetitionValue}
-                onChangeInput={setRepetitionValue}
-                onPressCaretDown={setRepetitionValue}
-                onPressCaretUp={setRepetitionValue}
+                onChangeInput={currentTooltip === "repetitions" ? undefined : setRepetitionValue}
+                onPressCaretDown={currentTooltip === "repetitions" ? undefined : setRepetitionValue}
+                onPressCaretUp={currentTooltip === "repetitions" ? undefined : setRepetitionValue}
                 maxNumber={trainingHook.exerciseActive?.repetitions}
               />
               <Text fontSize={"lg"} color={"text.900"} fontWeight={"medium"}>
@@ -335,9 +335,15 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
               </Text>
               <VerticalNumberInput
                 value={trainingHook.exerciseActive?.repetitions}
-                onChangeInput={handleChangeMaxRepetition}
-                onPressCaretDown={handlePressDownMaxRepetition}
-                onPressCaretUp={handlePressUpMaxRepetition}
+                onChangeInput={
+                  currentTooltip === "repetitions" ? undefined : handleChangeMaxRepetition
+                }
+                onPressCaretDown={
+                  currentTooltip === "repetitions" ? undefined : handlePressDownMaxRepetition
+                }
+                onPressCaretUp={
+                  currentTooltip === "repetitions" ? undefined : handlePressUpMaxRepetition
+                }
               />
             </HStack>
           </VStack>
@@ -367,9 +373,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
 
             <WeightInput
               value={trainingHook.exerciseActive?.weight || ""}
-              onChangeInput={handleChangeWeight}
-              onPressLess={handlePressLessWeight}
-              onPressPlus={handlePressPlusWeight}
+              onChangeInput={currentTooltip === "weight" ? () => {} : handleChangeWeight}
+              onPressLess={currentTooltip === "weight" ? () => {} : handlePressLessWeight}
+              onPressPlus={currentTooltip === "weight" ? () => {} : handlePressPlusWeight}
             />
           </VStack>
         </Tooltip>
@@ -421,7 +427,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
                 }
               />
             }
-            onPress={handlePressOpenFinish}
+            onPress={currentTooltip === "finished" ? undefined : handlePressOpenFinish}
           />
         </Tooltip>
 
@@ -463,7 +469,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
             <CustomAnimated.IconButton
               variant={"unstyled"}
               icon={<Ionicons name="body-outline" size={35} color={theme.colors.lightBlue[500]} />}
-              onPress={handlePressOpenMuscle}
+              onPress={currentTooltip === "muscleGroup" ? undefined : handlePressOpenMuscle}
             />
           </Box>
         </Tooltip>

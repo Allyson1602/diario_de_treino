@@ -145,7 +145,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
         <TextInputMask
           type={"datetime"}
           value={timerValue}
-          onChangeText={handleChangeTimerValue}
+          onChangeText={currentTooltip === "timerValue" ? undefined : handleChangeTimerValue}
           readOnly={toggleTimer}
           selectTextOnFocus
           options={{
@@ -189,7 +189,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
       >
         <Center position={"relative"}>
           <CustomAnimated.IconButton
-            onPress={handlePressTimer}
+            onPress={currentTooltip === "toggleTimer" ? undefined : handlePressTimer}
             icon={
               <Ionicons
                 name={toggleTimer ? "stop-outline" : "play-outline"}

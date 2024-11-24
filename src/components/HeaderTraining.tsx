@@ -160,7 +160,10 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
             placement="bottom"
             topAdjustment={-24}
           >
-            <Pressable flex={"1"} onPress={handlePressText}>
+            <Pressable
+              flex={"1"}
+              onPress={currentTooltip === "trainingName" ? undefined : handlePressText}
+            >
               <HStack
                 space={"2"}
                 flex={"1"}

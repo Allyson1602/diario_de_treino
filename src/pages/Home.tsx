@@ -189,7 +189,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
                   fontWeight: "medium",
                 }}
                 borderColor={"rose.600"}
-                onPress={handlePressNewWorkout}
+                onPress={currentTooltip === "newTraining" ? undefined : handlePressNewWorkout}
               >
                 Novo treino
               </Button>

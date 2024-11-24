@@ -59,7 +59,7 @@ export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (p
         borderRadius={currentTooltip === "exerciseNavigation" ? "2xl" : "none"}
       >
         <CustomAnimated.IconButton
-          onPress={handlePressLeft}
+          onPress={currentTooltip === "exerciseNavigation" ? undefined : handlePressLeft}
           rounded={"full"}
           isDisabled={props.leftIconDisabled}
           style={{ transform: [{ scale: scaleLeft }] }}
@@ -71,7 +71,7 @@ export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (p
 
         <Box position={"relative"}>
           <CustomAnimated.IconButton
-            onPress={handlePressRight}
+            onPress={currentTooltip === "exerciseNavigation" ? undefined : handlePressRight}
             rounded={"full"}
             isDisabled={props.rightIconDisabled}
             style={{ transform: [{ scale: scaleRight }] }}
@@ -89,7 +89,7 @@ export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (p
 
           {props.isLastExercise && (
             <CustomAnimated.IconButton
-              onPress={handlePressRight}
+              onPress={currentTooltip === "exerciseNavigation" ? undefined : handlePressRight}
               rounded={"full"}
               isDisabled={props.rightIconDisabled}
               style={{ transform: [{ scale: scaleRight }] }}
