@@ -1,8 +1,21 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Badge, Box, HStack, Text, TextArea, useDisclose, useTheme, VStack } from "native-base";
-import { FunctionComponent, useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import {
+  Badge,
+  Box,
+  Button,
+  HStack,
+  Modal,
+  Text,
+  TextArea,
+  useDisclose,
+  useTheme,
+  VStack,
+} from "native-base";
+import { FunctionComponent, useContext, useEffect, useState } from "react";
+import Tooltip from "react-native-walkthrough-tooltip";
 import { ExerciseNavigation } from "../components/ExerciseNavigation";
 import { ExerciseTimer } from "../components/ExerciseTimer";
 import { FinishTrainingModal } from "../components/FinishTrainingModal";
@@ -21,6 +34,8 @@ import {
   setWeightExercise,
 } from "../redux/slices/exerciseSlice";
 import { setExercise as setTrainingExercise } from "../redux/slices/trainingSlice";
+import { WalkthroughContext } from "../redux/walkthrough.context";
+import userMetadataStorage from "../storages/userMetadata.storage";
 
 type WorkoutProps = NativeStackScreenProps<RootStackParamList, "Workout", "RootStack">;
 
@@ -30,8 +45,17 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   const finishDisclose = useDisclose();
   const muscleDisclose = useDisclose();
   const dispatch = useAppDispatch();
+  const { currentTooltip, setCurrentTooltip } = useContext(WalkthroughContext);
 
   const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
+
+  const openTutorialStorage = async () => {
+    const isTutorialCompleted = await userMetadataStorage.getTutorialWorkout();
+
+    if (!isTutorialCompleted) {
+      setCurrentTooltip("firstInfoExercise");
+    }
+  };
 
   const updateStorageData = (exerciseUpdated: ExerciseModel) => {
     const exercisesTraining = trainingHook.trainingActive?.exercises || [];
@@ -223,6 +247,10 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     }
   };
 
+  useEffect(() => {
+    openTutorialStorage();
+  }, []);
+
   return (
     <Box
       safeArea
@@ -236,6 +264,16 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         },
       }}
     >
+      <StatusBar
+        backgroundColor={
+          currentTooltip === "" ||
+          currentTooltip === "firstInfoExercise" ||
+          currentTooltip === "secondInfoExercise"
+            ? undefined
+            : "#00000080"
+        }
+      />
+
       <VStack
         safeArea
         flex={"1"}
@@ -263,42 +301,84 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
           </Box>
         </VStack>
 
-        <VStack space={"1"} alignItems={"center"}>
-          <Text fontSize={"md"} color={"text.900"} fontWeight={"medium"}>
-            Repetições
-          </Text>
-          <HStack alignItems={"center"} space={"2"}>
-            <VerticalNumberInput
-              value={repetitionValue}
-              onChangeInput={setRepetitionValue}
-              onPressCaretDown={setRepetitionValue}
-              onPressCaretUp={setRepetitionValue}
-              maxNumber={trainingHook.exerciseActive?.repetitions}
-            />
-            <Text fontSize={"lg"} color={"text.900"} fontWeight={"medium"}>
-              de
+        <Tooltip
+          isVisible={currentTooltip === "repetitions"}
+          content={
+            <Box>
+              <Text>Informe a repetição atual e a quantidade de repetições</Text>
+            </Box>
+          }
+          onClose={() => setCurrentTooltip("weight")}
+          placement="bottom"
+          topAdjustment={-24}
+        >
+          <VStack
+            space={"1"}
+            alignItems={"center"}
+            bgColor={currentTooltip === "repetitions" ? "white:alpha.80" : "transparent"}
+            padding={currentTooltip === "repetitions" ? "2" : "0"}
+            borderRadius={currentTooltip === "repetitions" ? "2xl" : "none"}
+          >
+            <Text fontSize={"md"} color={"text.900"} fontWeight={"medium"}>
+              Repetições
             </Text>
-            <VerticalNumberInput
-              value={trainingHook.exerciseActive?.repetitions}
-              onChangeInput={handleChangeMaxRepetition}
-              onPressCaretDown={handlePressDownMaxRepetition}
-              onPressCaretUp={handlePressUpMaxRepetition}
+            <HStack alignItems={"center"} space={"2"}>
+              <VerticalNumberInput
+                value={repetitionValue}
+                onChangeInput={currentTooltip === "repetitions" ? undefined : setRepetitionValue}
+                onPressCaretDown={currentTooltip === "repetitions" ? undefined : setRepetitionValue}
+                onPressCaretUp={currentTooltip === "repetitions" ? undefined : setRepetitionValue}
+                maxNumber={trainingHook.exerciseActive?.repetitions}
+              />
+              <Text fontSize={"lg"} color={"text.900"} fontWeight={"medium"}>
+                de
+              </Text>
+              <VerticalNumberInput
+                value={trainingHook.exerciseActive?.repetitions}
+                onChangeInput={
+                  currentTooltip === "repetitions" ? undefined : handleChangeMaxRepetition
+                }
+                onPressCaretDown={
+                  currentTooltip === "repetitions" ? undefined : handlePressDownMaxRepetition
+                }
+                onPressCaretUp={
+                  currentTooltip === "repetitions" ? undefined : handlePressUpMaxRepetition
+                }
+              />
+            </HStack>
+          </VStack>
+        </Tooltip>
+
+        <Tooltip
+          isVisible={currentTooltip === "weight"}
+          content={
+            <Box>
+              <Text>Defina a carga usada</Text>
+            </Box>
+          }
+          onClose={() => setCurrentTooltip("timerValue")}
+          placement="bottom"
+          topAdjustment={-24}
+        >
+          <VStack
+            space={"1"}
+            alignItems={"center"}
+            bgColor={currentTooltip === "weight" ? "white:alpha.80" : "transparent"}
+            padding={currentTooltip === "weight" ? "2" : "0"}
+            borderRadius={currentTooltip === "weight" ? "2xl" : "none"}
+          >
+            <Text fontSize={"md"} color={"text.900"} fontWeight={"medium"}>
+              Carga
+            </Text>
+
+            <WeightInput
+              value={trainingHook.exerciseActive?.weight || ""}
+              onChangeInput={currentTooltip === "weight" ? () => {} : handleChangeWeight}
+              onPressLess={currentTooltip === "weight" ? () => {} : handlePressLessWeight}
+              onPressPlus={currentTooltip === "weight" ? () => {} : handlePressPlusWeight}
             />
-          </HStack>
-        </VStack>
-
-        <VStack space={"1"} alignItems={"center"}>
-          <Text fontSize={"md"} color={"text.900"} fontWeight={"medium"}>
-            Carga
-          </Text>
-
-          <WeightInput
-            value={trainingHook.exerciseActive?.weight || ""}
-            onChangeInput={handleChangeWeight}
-            onPressLess={handlePressLessWeight}
-            onPressPlus={handlePressPlusWeight}
-          />
-        </VStack>
+          </VStack>
+        </Tooltip>
 
         <VStack>
           <ExerciseTimer
@@ -318,51 +398,125 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       </VStack>
 
       <VStack safeArea position={"absolute"} top={"16"} right={"0"}>
-        <CustomAnimated.IconButton
-          variant={"unstyled"}
-          icon={
-            <MaterialCommunityIcons
-              name="fire"
-              size={45}
-              color={
-                repetitionValue === trainingHook.exerciseActive?.repetitions
-                  ? theme.colors.primary[500]
-                  : theme.colors.muted[400]
-              }
-            />
+        <Tooltip
+          isVisible={currentTooltip === "finished"}
+          content={
+            <Box>
+              <Text>Aqui você pode finalizar seu treino</Text>
+            </Box>
           }
-          onPress={handlePressOpenFinish}
-        />
-
-        <Box>
-          <Badge
-            colorScheme="lightBlue"
-            rounded="full"
-            mb={"-4"}
-            mr={"2"}
-            p={"0"}
-            w={"6"}
-            py={"0.5"}
-            zIndex={1}
-            variant="solid"
-            alignSelf="flex-end"
-            _text={{
-              fontSize: 12,
-            }}
-          >
-            {trainingHook.exerciseActive?.muscles.length || 0}
-          </Badge>
-
+          onClose={() => {
+            setCurrentTooltip("");
+            userMetadataStorage.toggleTutorialWorkout();
+          }}
+          placement="bottom"
+          topAdjustment={-24}
+        >
           <CustomAnimated.IconButton
+            bgColor={currentTooltip === "finished" ? "white:alpha.80" : "transparent"}
+            borderRadius={currentTooltip === "finished" ? "2xl" : "none"}
             variant={"unstyled"}
-            icon={<Ionicons name="body-outline" size={35} color={theme.colors.lightBlue[500]} />}
-            onPress={handlePressOpenMuscle}
+            icon={
+              <MaterialCommunityIcons
+                name="fire"
+                size={45}
+                color={
+                  repetitionValue === trainingHook.exerciseActive?.repetitions
+                    ? theme.colors.primary[500]
+                    : theme.colors.muted[400]
+                }
+              />
+            }
+            onPress={currentTooltip === "finished" ? undefined : handlePressOpenFinish}
           />
-        </Box>
+        </Tooltip>
+
+        <Tooltip
+          isVisible={currentTooltip === "muscleGroup"}
+          content={
+            <Box>
+              <Text>Defina os grupos musculares trabalhados</Text>
+            </Box>
+          }
+          onClose={() => setCurrentTooltip("repetitions")}
+          placement="bottom"
+          topAdjustment={-24}
+        >
+          <Box
+            bgColor={currentTooltip === "muscleGroup" ? "white:alpha.80" : "transparent"}
+            paddingTop={currentTooltip === "muscleGroup" ? "2" : "0"}
+            borderRadius={currentTooltip === "muscleGroup" ? "2xl" : "none"}
+            w={"full"}
+          >
+            <Badge
+              colorScheme="lightBlue"
+              rounded="full"
+              mb={"-4"}
+              mr={"2"}
+              p={"0"}
+              w={"6"}
+              py={"0.5"}
+              zIndex={1}
+              variant="solid"
+              alignSelf="flex-end"
+              _text={{
+                fontSize: 12,
+              }}
+            >
+              {trainingHook.exerciseActive?.muscles.length || 0}
+            </Badge>
+
+            <CustomAnimated.IconButton
+              variant={"unstyled"}
+              icon={<Ionicons name="body-outline" size={35} color={theme.colors.lightBlue[500]} />}
+              onPress={currentTooltip === "muscleGroup" ? undefined : handlePressOpenMuscle}
+            />
+          </Box>
+        </Tooltip>
       </VStack>
 
       <FinishTrainingModal isOpen={finishDisclose.isOpen} onClose={finishDisclose.onClose} />
       <MuscleModal isOpen={muscleDisclose.isOpen} onClose={muscleDisclose.onClose} />
+
+      <Modal
+        isOpen={currentTooltip === "firstInfoExercise"}
+        onClose={() => setCurrentTooltip("secondInfoExercise")}
+      >
+        <Modal.Content maxWidth="400px">
+          <Modal.Body>
+            <Text>Aqui você pode configurar seu novo exercício</Text>
+            <HStack justifyContent={"flex-end"}>
+              <Button
+                colorScheme={"green"}
+                variant={"ghost"}
+                onPress={() => setCurrentTooltip("secondInfoExercise")}
+              >
+                próximo
+              </Button>
+            </HStack>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal>
+
+      <Modal
+        isOpen={currentTooltip === "secondInfoExercise"}
+        onClose={() => setCurrentTooltip("exerciseName")}
+      >
+        <Modal.Content maxWidth="400px">
+          <Modal.Body>
+            <Text>Cada novo exercício é adicionado automaticamente na lista de exercícios</Text>
+            <HStack justifyContent={"flex-end"}>
+              <Button
+                colorScheme={"green"}
+                variant={"ghost"}
+                onPress={() => setCurrentTooltip("exerciseName")}
+              >
+                próximo
+              </Button>
+            </HStack>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal>
     </Box>
   );
 };

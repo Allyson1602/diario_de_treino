@@ -1,10 +1,12 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { StatusBar } from "expo-status-bar";
 import moment from "moment";
 import {
   Actionsheet,
   Box,
   Button,
+  Center,
   HStack,
   Image,
   Link,
@@ -14,7 +16,9 @@ import {
   useTheme,
   VStack,
 } from "native-base";
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useCallback, useContext, useState } from "react";
+import Tooltip from "react-native-walkthrough-tooltip";
+import HomeVectorTrainingImage from "../../assets/images/app/home-vector-training.png";
 import QRCodePixImage from "../../assets/images/app/qrcode_pix.png";
 import { Card } from "../components/Card/index";
 import { MotivationPhrases } from "../components/MotivationalPhrases";
@@ -22,6 +26,8 @@ import { getAllMuscleTraining } from "../helpers/getAllMuscleTraining";
 import { useTraining } from "../hooks/useTraining";
 import { TrainingModel } from "../models/training.model";
 import { RootStackParamList } from "../navigation";
+import { WalkthroughContext } from "../redux/walkthrough.context";
+import userMetadataStorage from "../storages/userMetadata.storage";
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, "Home", "RootStack">;
 
@@ -29,8 +35,17 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   const theme = useTheme();
   const trainingHook = useTraining();
   const { isOpen, onClose, onOpen } = useDisclose();
+  const { currentTooltip, setCurrentTooltip } = useContext(WalkthroughContext);
 
   const [trainingsData, setTrainingsData] = useState<TrainingModel[]>([]);
+
+  const openTutorialStorage = async () => {
+    const isTutorialCompleted = await userMetadataStorage.getTutorialHome();
+
+    if (!isTutorialCompleted) {
+      setCurrentTooltip("newTraining");
+    }
+  };
 
   const listTrainingsByStorage = async () => {
     const trainingsStorage = (await trainingHook.getStorageData()) || [];
@@ -70,6 +85,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       listTrainingsByStorage();
+      openTutorialStorage();
     }, []),
   );
 
@@ -87,6 +103,8 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
           },
         }}
       >
+        <StatusBar backgroundColor={currentTooltip === "" ? undefined : "#00000080"} />
+
         <VStack flex={1} mb={"4"}>
           <Text color={"text.500"} fontWeight={"medium"} px={"6"}>
             Treinos
@@ -119,15 +137,26 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
               ))}
             </ScrollView>
           ) : (
-            <Text
-              textAlign={"center"}
-              pt={"6"}
-              fontWeight={"light"}
-              fontSize={"md"}
-              color={"text.500"}
-            >
-              Para iniciar, clique em <Text fontWeight={"black"}>Novo Treino</Text>
-            </Text>
+            <VStack flex={1} justifyContent={"space-between"}>
+              <Text
+                textAlign={"center"}
+                pt={"6"}
+                fontWeight={"light"}
+                fontSize={"md"}
+                color={"text.500"}
+              >
+                Para iniciar, clique em <Text fontWeight={"black"}>Novo Treino</Text>
+              </Text>
+
+              <Center flex={"1"}>
+                <Image
+                  source={HomeVectorTrainingImage}
+                  alt="Duas pessoas treinando com halter"
+                  size={"2xl"}
+                  opacity={0.4}
+                />
+              </Center>
+            </VStack>
           )}
         </VStack>
 
@@ -135,17 +164,36 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
           <VStack space={"10"} pt={"4"} px={"6"}>
             <MotivationPhrases />
 
-            <Button
-              variant={"outline"}
-              _text={{
-                color: "rose.600",
-                fontWeight: "medium",
+            <Tooltip
+              isVisible={currentTooltip === "newTraining"}
+              content={
+                <Box>
+                  <Text>Clique aqui para iniciar um novo treino</Text>
+                </Box>
+              }
+              onClose={() => {
+                setCurrentTooltip("");
+                userMetadataStorage.toggleTutorialHome();
               }}
-              borderColor={"rose.600"}
-              onPress={handlePressNewWorkout}
+              placement="top"
+              topAdjustment={-24}
             >
-              Novo treino
-            </Button>
+              <Button
+                variant={"outline"}
+                w={"full"}
+                h={"10"}
+                bgColor={currentTooltip === "newTraining" ? "white:alpha.80" : "transparent"}
+                padding={currentTooltip === "newTraining" ? "2" : "0"}
+                _text={{
+                  color: "rose.600",
+                  fontWeight: "medium",
+                }}
+                borderColor={"rose.600"}
+                onPress={currentTooltip === "newTraining" ? undefined : handlePressNewWorkout}
+              >
+                Novo treino
+              </Button>
+            </Tooltip>
           </VStack>
 
           <Button
