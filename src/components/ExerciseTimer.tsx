@@ -1,11 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect } from "@react-navigation/native";
 import moment from "moment";
-import { Center, Input, useTheme, VStack } from "native-base";
-import { FunctionComponent, useCallback, useState } from "react";
+import { Box, Center, Input, Text, useTheme, VStack } from "native-base";
+import { FunctionComponent, useCallback, useContext, useState } from "react";
 import { Keyboard, ViewStyle } from "react-native";
 import { TextInputMask } from "react-native-masked-text";
 import { SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
+import Tooltip from "react-native-walkthrough-tooltip";
+import { WalkthroughContext } from "../redux/walkthrough.context";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
 const MIN_TIMER_VALUE = "0:00";
@@ -23,6 +25,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
   const theme = useTheme();
   const scaleTimer = useSharedValue(1);
   const scaleRestart = useSharedValue(1);
+  const { currentTooltip, setCurrentTooltip } = useContext(WalkthroughContext);
 
   const [toggleTimer, setToggleTimer] = useState(false);
   const [timerValue, setTimerValue] = useState(props.timerValue);
@@ -128,71 +131,100 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
 
   return (
     <VStack style={props.containerStyle}>
-      <TextInputMask
-        type={"datetime"}
-        value={timerValue}
-        onChangeText={handleChangeTimerValue}
-        readOnly={toggleTimer}
-        selectTextOnFocus
-        options={{
-          format: "m:ss",
-        }}
-        customTextInput={Input}
-        customTextInputProps={{
-          textAlign: "center",
-          variant: "unstyled",
-          size: "xl",
-          color: "primary.500",
-          fontWeight: "medium",
-          py: "0",
-          height: 8,
-          maxHeight: 8,
-          selectionColor: theme.colors.blue[400],
-          _focus: {
-            _android: {
-              selectionColor: theme.colors.blue[400],
+      <Tooltip
+        isVisible={currentTooltip === "timerValue"}
+        content={
+          <Box>
+            <Text>Defina o tempo de descanso</Text>
+          </Box>
+        }
+        onClose={() => setCurrentTooltip("toggleTimer")}
+        placement="bottom"
+        topAdjustment={-24}
+      >
+        <TextInputMask
+          type={"datetime"}
+          value={timerValue}
+          onChangeText={currentTooltip === "timerValue" ? undefined : handleChangeTimerValue}
+          readOnly={toggleTimer}
+          selectTextOnFocus
+          options={{
+            format: "m:ss",
+          }}
+          customTextInput={Input}
+          customTextInputProps={{
+            width: "100",
+            mx: "auto",
+            bgColor: currentTooltip === "timerValue" ? "white:alpha.80" : "transparent",
+            borderRadius: currentTooltip === "timerValue" ? "2xl" : "none",
+
+            textAlign: "center",
+            variant: "unstyled",
+            size: "xl",
+            color: "primary.500",
+            fontWeight: "medium",
+            py: "0",
+            height: 8,
+            maxHeight: 8,
+            selectionColor: theme.colors.blue[400],
+            _focus: {
+              _android: {
+                selectionColor: theme.colors.blue[400],
+              },
             },
-          },
-        }}
-      />
-
-      <Center position={"relative"}>
-        <CustomAnimated.IconButton
-          onPress={handlePressTimer}
-          icon={
-            <Ionicons
-              name={toggleTimer ? "stop-outline" : "play-outline"}
-              size={64}
-              color={theme.colors.white + "CC"}
-            />
-          }
-          bgColor={"primary.500"}
-          alignSelf={"center"}
-          rounded={"full"}
-          style={{ transform: [{ scale: scaleTimer }] }}
+          }}
         />
+      </Tooltip>
 
-        <CustomAnimated.IconButton
-          onPress={handlePressRestart}
-          icon={
-            <Ionicons
-              name="reload"
-              size={24}
-              color={theme.colors.white + "CC"}
-              style={{
-                transform: [{ rotateY: "180deg" }],
-              }}
-            />
-          }
-          size={"xs"}
-          position={"absolute"}
-          bottom={-24}
-          bgColor={"primary.300"}
-          alignSelf={"center"}
-          rounded={"full"}
-          style={{ transform: [{ scale: scaleRestart }] }}
-        />
-      </Center>
+      <Tooltip
+        isVisible={currentTooltip === "toggleTimer"}
+        content={
+          <Box>
+            <Text>Inicie, pauso ou reinicie o tempo de descanso</Text>
+          </Box>
+        }
+        onClose={() => setCurrentTooltip("exerciseNavigation")}
+        placement="top"
+        topAdjustment={-24}
+      >
+        <Center position={"relative"}>
+          <CustomAnimated.IconButton
+            onPress={currentTooltip === "toggleTimer" ? undefined : handlePressTimer}
+            icon={
+              <Ionicons
+                name={toggleTimer ? "stop-outline" : "play-outline"}
+                size={64}
+                color={theme.colors.white + "CC"}
+              />
+            }
+            bgColor={"primary.500"}
+            alignSelf={"center"}
+            rounded={"full"}
+            style={{ transform: [{ scale: scaleTimer }] }}
+          />
+
+          <CustomAnimated.IconButton
+            onPress={handlePressRestart}
+            icon={
+              <Ionicons
+                name="reload"
+                size={24}
+                color={theme.colors.white + "CC"}
+                style={{
+                  transform: [{ rotateY: "180deg" }],
+                }}
+              />
+            }
+            size={"xs"}
+            position={"absolute"}
+            bottom={-24}
+            bgColor={"primary.300"}
+            alignSelf={"center"}
+            rounded={"full"}
+            style={{ transform: [{ scale: scaleRestart }] }}
+          />
+        </Center>
+      </Tooltip>
     </VStack>
   );
 };

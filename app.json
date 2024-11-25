@@ -2,7 +2,7 @@
   "expo": {
     "name": "Diário de treino",
     "slug": "diario_de_treino",
-    "version": "1.1.1",
+    "version": "1.2.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
@@ -20,6 +20,9 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.allysonathyrson.diario_de_treino"
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#00000000"
     },
     "web": {
       "favicon": "./assets/images/icon.png"
