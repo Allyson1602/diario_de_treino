@@ -26,15 +26,7 @@ import { WeightInput } from "../components/WeightInput";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
 import { RootStackParamList } from "../navigation";
-import { useAppDispatch } from "../redux/hooks";
-import {
-  setAnnotationExercise,
-  setRepetitionsExercise,
-  setTimerExercise,
-  setWeightExercise,
-} from "../redux/slices/exerciseSlice";
-import { setExercise as setTrainingExercise } from "../redux/slices/trainingSlice";
-import { WalkthroughContext } from "../redux/walkthrough.context";
+import { WalkthroughContext } from "../contexts/walkthrough.context";
 import userMetadataStorage from "../storages/userMetadata.storage";
 
 type WorkoutProps = NativeStackScreenProps<RootStackParamList, "Workout", "RootStack">;
@@ -44,7 +36,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   const trainingHook = useTraining();
   const finishDisclose = useDisclose();
   const muscleDisclose = useDisclose();
-  const dispatch = useAppDispatch();
   const { currentTooltip, setCurrentTooltip } = useContext(WalkthroughContext);
 
   const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
@@ -73,7 +64,10 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       exercises: updateExercisesTraining,
     });
 
-    dispatch(setTrainingExercise(exerciseUpdated));
+    trainingHook.setTrainingActive({
+      ...trainingHook.trainingActive!,
+      exercises: updateExercisesTraining,
+    });
   };
 
   const updateRepetitionsData = (repetitionNumberValue: number | null) => {
@@ -86,7 +80,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       requestAnimationFrame(() => {
-        dispatch(setRepetitionsExercise(repetitionNumberValue || undefined));
+        trainingHook.setExerciseActive(exerciseUpdated);
       });
       void updateStorageData(exerciseUpdated);
     }
@@ -119,7 +113,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       requestAnimationFrame(() => {
-        dispatch(setWeightExercise(weightValue));
+        trainingHook.setExerciseActive(exerciseUpdated);
       });
       void updateStorageData(exerciseUpdated);
     }
@@ -173,7 +167,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       requestAnimationFrame(() => {
-        dispatch(setAnnotationExercise(text));
+        trainingHook.setExerciseActive(exerciseUpdated);
       });
       void updateStorageData(exerciseUpdated);
     }
@@ -213,7 +207,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       requestAnimationFrame(() => {
-        dispatch(setTimerExercise(timerValue));
+        trainingHook.setExerciseActive(exerciseUpdated);
       });
       void updateStorageData(exerciseUpdated);
     }
@@ -380,7 +374,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
           </VStack>
         </Tooltip>
 
-        <VStack>
+        <VStack position={"relative"}>
           <ExerciseTimer
             timerValue={trainingHook.exerciseActive?.timer || "2:00"}
             onChangeTimerValue={handleChangeTimer}

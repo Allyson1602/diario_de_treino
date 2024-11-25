@@ -7,7 +7,7 @@ import { Keyboard, ViewStyle } from "react-native";
 import { TextInputMask } from "react-native-masked-text";
 import { SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import Tooltip from "react-native-walkthrough-tooltip";
-import { WalkthroughContext } from "../redux/walkthrough.context";
+import { WalkthroughContext } from "../contexts/walkthrough.context";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
 const MIN_TIMER_VALUE = "0:00";
@@ -130,7 +130,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
   );
 
   return (
-    <VStack style={props.containerStyle}>
+    <VStack style={props.containerStyle} zIndex={"1"}>
       <Tooltip
         isVisible={currentTooltip === "timerValue"}
         content={
@@ -212,6 +212,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
                 color={theme.colors.white + "CC"}
                 style={{
                   transform: [{ rotateY: "180deg" }],
+                  zIndex: 9999999,
                 }}
               />
             }

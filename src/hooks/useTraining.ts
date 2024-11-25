@@ -8,11 +8,11 @@ import { mostDefinedValueTimer } from "../helpers/mostDefinedValueTimer";
 import { IStorageData } from "../interfaces/storageData";
 import { ExerciseModel } from "../models/exercise.model";
 import { TrainingModel } from "../models/training.model";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { setExercise } from "../redux/slices/exerciseSlice";
-import { setTraining } from "../redux/slices/trainingSlice";
+import { ExerciseContext } from "../contexts/exercise.context";
 import { StorageKeys } from "../storages/_storageKeys";
 import trainingStorage from "../storages/training.storage";
+import { useContext } from "react";
+import { TrainingContext } from "../contexts/training.context";
 
 interface IUseTraining extends IStorageData<TrainingModel> {
   exerciseActive: ExerciseModel | null;
@@ -25,9 +25,8 @@ interface IUseTraining extends IStorageData<TrainingModel> {
 }
 
 export const useTraining = (): IUseTraining => {
-  const exerciseActive = useAppSelector((state) => state.exercise.value);
-  const trainingActive = useAppSelector((state) => state.training.value);
-  const dispatch = useAppDispatch();
+  const { exercise: exerciseActive, setExercise: setExerciseActive } = useContext(ExerciseContext);
+  const { training: trainingActive, setTraining: setTrainingActive } = useContext(TrainingContext);
 
   const getMoreRecentExercise = (): ExerciseModel | null => {
     if (trainingActive) {
@@ -125,14 +124,6 @@ export const useTraining = (): IUseTraining => {
       repetitions: mostUsedRepetitions,
       createdDate: moment().format(),
     };
-  };
-
-  const setTrainingActive = (newTraining: TrainingModel | null) => {
-    dispatch(setTraining(newTraining));
-  };
-
-  const setExerciseActive = (newExercise: ExerciseModel | null) => {
-    dispatch(setExercise(newExercise));
   };
 
   const removeExercise = async (exerciseRemove: ExerciseModel) => {
