@@ -50,7 +50,6 @@ export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (p
       }
       onClose={() => setCurrentTooltip("finished")}
       placement="top"
-      topAdjustment={-24}
     >
       <HStack
         justifyContent={"space-around"}

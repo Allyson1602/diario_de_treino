@@ -9,6 +9,7 @@ import { SharedValue, useSharedValue, withTiming } from "react-native-reanimated
 import Tooltip from "react-native-walkthrough-tooltip";
 import { WalkthroughContext } from "../redux/walkthrough.context";
 import { CustomAnimated } from "./ui/CustomAnimated";
+import BackgroundTimer from "react-native-background-timer";
 
 const MIN_TIMER_VALUE = "0:00";
 const MAX_SECONDS = 59;
@@ -29,7 +30,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
 
   const [toggleTimer, setToggleTimer] = useState(false);
   const [timerValue, setTimerValue] = useState(props.timerValue);
-  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | undefined>();
+  const [timerInterval, setTimerInterval] = useState<number | undefined>();
 
   const defineAnimationOnPress = (scale: SharedValue<number>) => {
     scale.value = withTiming(0.9, { duration: 100 }, () => {
@@ -43,18 +44,20 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
 
     const startDate = moment().add(1, "second");
 
-    if (timerInterval) clearInterval(timerInterval);
+    if (timerInterval) BackgroundTimer.clearInterval(timerInterval);
 
-    const newInterval = setInterval(() => {
-      if (timerInterval) return;
-
+    const newInterval = BackgroundTimer.setInterval(() => {
       const elapsedTime = moment().diff(startDate, "milliseconds");
       const remainingTime = moment.duration(
         moment(updateTimer, "m:ss").diff(elapsedTime, "milliseconds"),
       );
 
-      const formattedTime = moment.utc(remainingTime.asMilliseconds()).format("m:ss");
-      setTimerValue(formattedTime);
+      if (remainingTime.asSeconds() > 1) {
+        const formattedTime = moment.utc(remainingTime.asMilliseconds()).format("m:ss");
+        setTimerValue(formattedTime);
+      } else {
+        stopTimer();
+      }
     }, 1000);
 
     setTimerInterval(newInterval);
@@ -65,7 +68,7 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
   };
 
   const stopTimer = () => {
-    clearInterval(timerInterval);
+    if (timerInterval) BackgroundTimer.clearInterval(timerInterval);
     setTimerInterval(undefined);
     setToggleTimer(false);
   };
@@ -140,7 +143,6 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
         }
         onClose={() => setCurrentTooltip("toggleTimer")}
         placement="bottom"
-        topAdjustment={-24}
       >
         <TextInputMask
           type={"datetime"}
@@ -185,7 +187,6 @@ export const ExerciseTimer: FunctionComponent<ExerciseTimerProps> = (props) => {
         }
         onClose={() => setCurrentTooltip("exerciseNavigation")}
         placement="top"
-        topAdjustment={-24}
       >
         <Center position={"relative"}>
           <CustomAnimated.IconButton

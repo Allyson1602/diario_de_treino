@@ -148,7 +148,6 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
             }
             onClose={() => setCurrentTooltip("muscleGroup")}
             placement="bottom"
-            topAdjustment={-24}
           >
             <Pressable
               flex={"1"}

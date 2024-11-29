@@ -16,11 +16,12 @@ class UserMetadataStorage implements IUserMetadataStorage {
     const isTutorialCompleted = await this.getTutorialWorkout();
 
     try {
-      const isTutorialCompletedJson = JSON.stringify(isTutorialCompleted || false);
+      const isTutorialCompletedJson = JSON.stringify(isTutorialCompleted || true);
       await AsyncStorage.setItem(
         StorageKeys.USER_METADATA_TUTORIAL_WORKOUT,
         isTutorialCompletedJson,
       );
+      console.log("fechado", isTutorialCompletedJson);
     } catch (error) {
       Toast.show({
         type: "error",
@@ -53,7 +54,7 @@ class UserMetadataStorage implements IUserMetadataStorage {
     const isTutorialCompleted = await this.getTutorialHome();
 
     try {
-      const isTutorialCompletedJson = JSON.stringify(isTutorialCompleted || false);
+      const isTutorialCompletedJson = JSON.stringify(isTutorialCompleted || true);
       await AsyncStorage.setItem(StorageKeys.USER_METADATA_TUTORIAL_HOME, isTutorialCompletedJson);
     } catch (error) {
       Toast.show({
@@ -87,7 +88,7 @@ class UserMetadataStorage implements IUserMetadataStorage {
     const isTutorialCompleted = await this.getTutorialTraining();
 
     try {
-      const isTutorialCompletedJson = JSON.stringify(isTutorialCompleted || false);
+      const isTutorialCompletedJson = JSON.stringify(isTutorialCompleted || true);
       await AsyncStorage.setItem(
         StorageKeys.USER_METADATA_TUTORIAL_TRAINING,
         isTutorialCompletedJson,

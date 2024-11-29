@@ -176,7 +176,6 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
                 userMetadataStorage.toggleTutorialHome();
               }}
               placement="top"
-              topAdjustment={-24}
             >
               <Button
                 variant={"outline"}
