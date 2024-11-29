@@ -310,7 +310,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
           }
           onClose={() => setCurrentTooltip("weight")}
           placement="bottom"
-          topAdjustment={-24}
         >
           <VStack
             space={"1"}
@@ -358,7 +357,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
           }
           onClose={() => setCurrentTooltip("timerValue")}
           placement="bottom"
-          topAdjustment={-24}
         >
           <VStack
             space={"1"}
@@ -410,7 +408,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
             userMetadataStorage.toggleTutorialWorkout();
           }}
           placement="bottom"
-          topAdjustment={-24}
         >
           <CustomAnimated.IconButton
             bgColor={currentTooltip === "finished" ? "white:alpha.80" : "transparent"}
@@ -440,7 +437,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
           }
           onClose={() => setCurrentTooltip("repetitions")}
           placement="bottom"
-          topAdjustment={-24}
         >
           <Box
             bgColor={currentTooltip === "muscleGroup" ? "white:alpha.80" : "transparent"}

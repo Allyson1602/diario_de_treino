@@ -158,7 +158,6 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
               userMetadataStorage.toggleTutorialTraining();
             }}
             placement="bottom"
-            topAdjustment={-24}
           >
             <Pressable
               flex={"1"}
