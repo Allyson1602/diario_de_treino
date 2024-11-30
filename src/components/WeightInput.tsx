@@ -1,6 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { HStack, Input, useTheme } from "native-base";
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useCallback, useState, useTransition } from "react";
 import { Keyboard } from "react-native";
 import { cancelAnimation, SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { convertPointToWasp } from "../utils/convertPointToWasp";
@@ -22,6 +22,7 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
   const theme = useTheme();
   const scaleLess = useSharedValue(1);
   const scalePlus = useSharedValue(1);
+  const [isPending, startTransition] = useTransition();
 
   const [inputValue, setInputValue] = useState("");
 
@@ -93,7 +94,11 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
       const weightString = convertPointToWasp(weightText);
 
       setInputValue(weightString);
-      props.onChangeInput(weightString);
+
+      startTransition(() => {
+        props.onChangeInput(weightString);
+      });
+
       return;
     }
   };
@@ -101,7 +106,7 @@ export const WeightInput: FunctionComponent<WeightInputProps> = (props) => {
   useFocusEffect(
     useCallback(() => {
       setInputValue(props.value);
-    }, [props.value]),
+    }, []),
   );
 
   return (

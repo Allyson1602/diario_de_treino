@@ -7,7 +7,7 @@ import { Keyboard, ViewStyle } from "react-native";
 import { TextInputMask } from "react-native-masked-text";
 import { SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import Tooltip from "react-native-walkthrough-tooltip";
-import { WalkthroughContext } from "../redux/walkthrough.context";
+import { WalkthroughContext } from "../contexts/walkthrough.context";
 import { CustomAnimated } from "./ui/CustomAnimated";
 import BackgroundTimer from "react-native-background-timer";
 

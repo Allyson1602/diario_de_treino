@@ -26,8 +26,11 @@ import { getAllMuscleTraining } from "../helpers/getAllMuscleTraining";
 import { useTraining } from "../hooks/useTraining";
 import { TrainingModel } from "../models/training.model";
 import { RootStackParamList } from "../navigation";
-import { WalkthroughContext } from "../redux/walkthrough.context";
+import { WalkthroughContext } from "../contexts/walkthrough.context";
 import userMetadataStorage from "../storages/userMetadata.storage";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { exerciseActiveState } from "../contexts/recoil/exerciseActiveState";
+import { trainingActiveState } from "../contexts/recoil/trainingActiveState";
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, "Home", "RootStack">;
 
@@ -38,6 +41,8 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   const { currentTooltip, setCurrentTooltip } = useContext(WalkthroughContext);
 
   const [trainingsData, setTrainingsData] = useState<TrainingModel[]>([]);
+  const setTrainingActive = useSetRecoilState(trainingActiveState);
+  const setExerciseActive = useSetRecoilState(exerciseActiveState);
 
   const openTutorialStorage = async () => {
     const isTutorialCompleted = await userMetadataStorage.getTutorialHome();
@@ -58,7 +63,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
     const trainingList = await trainingHook.getStorageData();
     const newExercise = await trainingHook.createExercise();
 
-    trainingHook.setExerciseActive(newExercise);
+    setExerciseActive(newExercise);
 
     if (newTraining) {
       const updateTraining = {
@@ -66,7 +71,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
         exercises: [...newTraining.exercises, newExercise],
       };
 
-      trainingHook.setTrainingActive(updateTraining);
+      setTrainingActive(updateTraining);
       trainingHook.setStorageData([...trainingList, updateTraining]);
     }
   };
@@ -78,7 +83,7 @@ export const Home: FunctionComponent<HomeProps> = ({ navigation }) => {
   };
 
   const handlePressTrainingItem = (trainingItem: TrainingModel) => {
-    trainingHook.setTrainingActive(trainingItem);
+    setTrainingActive(trainingItem);
     navigation.navigate("Training");
   };
 
