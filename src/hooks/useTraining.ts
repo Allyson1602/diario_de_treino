@@ -10,15 +10,10 @@ import { ExerciseModel } from "../models/exercise.model";
 import { TrainingModel } from "../models/training.model";
 import { StorageKeys } from "../storages/_storageKeys";
 import trainingStorage from "../storages/training.storage";
-import { SetterOrUpdater, useRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { trainingActiveState } from "../contexts/recoil/trainingActiveState";
-import { exerciseActiveState } from "../contexts/recoil/exerciseActiveState";
 
 interface IUseTraining extends IStorageData<TrainingModel> {
-  exerciseActive: ExerciseModel | null;
-  setExerciseActive: SetterOrUpdater<ExerciseModel | null>;
-  trainingActive: TrainingModel | null;
-  setTrainingActive: SetterOrUpdater<TrainingModel | null>;
   removeExercise: (exerciseRemove: ExerciseModel) => Promise<boolean>;
   createExercise: () => Promise<ExerciseModel>;
   createTraining: () => Promise<TrainingModel>;
@@ -26,7 +21,6 @@ interface IUseTraining extends IStorageData<TrainingModel> {
 
 export const useTraining = (): IUseTraining => {
   const [trainingActive, setTrainingActive] = useRecoilState(trainingActiveState);
-  const [exerciseActive, setExerciseActive] = useRecoilState(exerciseActiveState);
 
   const getMoreRecentExercise = (): ExerciseModel | null => {
     if (trainingActive) {
@@ -172,11 +166,5 @@ export const useTraining = (): IUseTraining => {
     createTraining,
     createExercise,
     removeExercise,
-
-    trainingActive,
-    setTrainingActive,
-
-    exerciseActive,
-    setExerciseActive,
   };
 };

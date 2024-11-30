@@ -18,6 +18,9 @@ import { CustomAnimated } from "../components/ui/CustomAnimated";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
 import { RootStackParamList } from "../navigation";
+import { useRecoilState } from "recoil";
+import { exerciseActiveState } from "../contexts/recoil/exerciseActiveState";
+import { trainingActiveState } from "../contexts/recoil/trainingActiveState";
 
 type TrainingProps = NativeStackScreenProps<RootStackParamList, "Training", "RootStack">;
 
@@ -27,6 +30,8 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
   const { isOpen, onClose, onOpen } = useDisclose(false);
   const scaleStartWorkout = useSharedValue(1);
   const scaleAddWorkout = useSharedValue(1);
+  const [exerciseActive, setExerciseActive] = useRecoilState(exerciseActiveState);
+  const [trainingActive, setTrainingActive] = useRecoilState(trainingActiveState);
 
   const defineAnimationOnPress = (scale: SharedValue<number>) => {
     cancelAnimation(scale);
@@ -37,9 +42,8 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
   };
 
   const createExercise = async () => {
-    const trainingActive = trainingHook.trainingActive;
     const newExercise = await trainingHook.createExercise();
-    trainingHook.setExerciseActive(newExercise);
+    setExerciseActive(newExercise);
 
     if (trainingActive) {
       const updateTraining = {
@@ -47,7 +51,7 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
         exercises: [...trainingActive.exercises, newExercise],
       };
 
-      trainingHook.setTrainingActive(updateTraining);
+      setTrainingActive(updateTraining);
       trainingHook.updateStorageData(updateTraining);
     }
   };
@@ -60,7 +64,7 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
   };
 
   const handleRemoveExercise = (exerciseSelected: ExerciseModel) => {
-    const exercises = trainingHook.trainingActive?.exercises;
+    const exercises = trainingActive?.exercises;
 
     if (exercises?.length === 1) {
       onOpen();
@@ -71,12 +75,12 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
   };
 
   const handlePressStartWorkout = () => {
-    const firstExercise = trainingHook.trainingActive?.exercises[0];
+    const firstExercise = trainingActive?.exercises[0];
 
     defineAnimationOnPress(scaleStartWorkout);
 
     if (firstExercise) {
-      trainingHook.setExerciseActive(firstExercise);
+      setExerciseActive(firstExercise);
     } else {
       void createExercise();
     }
@@ -85,14 +89,14 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
   };
 
   const handlePressExerciseItem = (exerciseItem: ExerciseModel) => {
-    trainingHook.setExerciseActive(exerciseItem);
+    setExerciseActive(exerciseItem);
     navigation.navigate("Workout");
   };
 
   const handleDeleteTraining = () => {
-    trainingHook.removeStorageData(trainingHook.trainingActive!).then((status) => {
+    trainingHook.removeStorageData(trainingActive!).then((status) => {
       if (status) {
-        trainingHook.setTrainingActive(null);
+        setTrainingActive(null);
         navigation.navigate("Home");
       }
     });
@@ -138,7 +142,7 @@ export const Training: FunctionComponent<TrainingProps> = ({ navigation }) => {
             }}
             showsVerticalScrollIndicator={false}
           >
-            {trainingHook.trainingActive?.exercises.map((exerciseItem) => (
+            {trainingActive?.exercises.map((exerciseItem) => (
               <Card.Container
                 key={exerciseItem.id}
                 onPress={() => handlePressExerciseItem(exerciseItem)}

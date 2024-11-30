@@ -28,6 +28,9 @@ import { ExerciseModel } from "../models/exercise.model";
 import { RootStackParamList } from "../navigation";
 import { WalkthroughContext } from "../contexts/walkthrough.context";
 import userMetadataStorage from "../storages/userMetadata.storage";
+import { exerciseActiveState } from "../contexts/recoil/exerciseActiveState";
+import { trainingActiveState } from "../contexts/recoil/trainingActiveState";
+import { useRecoilState } from "recoil";
 
 type WorkoutProps = NativeStackScreenProps<RootStackParamList, "Workout", "RootStack">;
 
@@ -38,6 +41,8 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   const muscleDisclose = useDisclose();
   const { currentTooltip, setCurrentTooltip } = useContext(WalkthroughContext);
 
+  const [exerciseActive, setExerciseActive] = useRecoilState(exerciseActiveState);
+  const [trainingActive, setTrainingActive] = useRecoilState(trainingActiveState);
   const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
 
   const openTutorialStorage = async () => {
@@ -49,7 +54,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   };
 
   const updateStorageData = (exerciseUpdated: ExerciseModel) => {
-    const exercisesTraining = trainingHook.trainingActive?.exercises || [];
+    const exercisesTraining = trainingActive?.exercises || [];
 
     const updateExercisesTraining = exercisesTraining.map((exerciseItem) => {
       if (exerciseItem.id === exerciseUpdated.id) {
@@ -60,11 +65,11 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
     });
 
     trainingHook.updateStorageData({
-      ...trainingHook.trainingActive!,
+      ...trainingActive!,
       exercises: updateExercisesTraining,
     });
 
-    trainingHook.setTrainingActive((oldTrainingActive) => {
+    setTrainingActive((oldTrainingActive) => {
       if (!oldTrainingActive) return null;
 
       return {
@@ -75,15 +80,13 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   };
 
   const updateRepetitionsData = (repetitionNumberValue: number | null) => {
-    const exerciseActive = trainingHook.exerciseActive;
-
     if (exerciseActive) {
       const exerciseUpdated: ExerciseModel = {
         ...exerciseActive,
         repetitions: repetitionNumberValue || 0,
       };
 
-      trainingHook.setExerciseActive((oldExerciseActive) => {
+      setExerciseActive((oldExerciseActive) => {
         if (!oldExerciseActive) return null;
 
         return {
@@ -97,10 +100,9 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   };
 
   const createExercise = async () => {
-    const trainingActive = trainingHook.trainingActive;
     const newExercise = await trainingHook.createExercise();
 
-    trainingHook.setExerciseActive(newExercise);
+    setExerciseActive(newExercise);
 
     if (trainingActive) {
       const updateTraining = {
@@ -108,37 +110,33 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         exercises: [...trainingActive.exercises, newExercise],
       };
 
-      trainingHook.setTrainingActive(updateTraining);
+      setTrainingActive(updateTraining);
       trainingHook.updateStorageData(updateTraining);
     }
   };
 
   const updateWeightData = (weightValue: string) => {
-    const exerciseActive = trainingHook.exerciseActive;
-
     if (exerciseActive) {
       const exerciseUpdated: ExerciseModel = {
         ...exerciseActive,
         weight: weightValue,
       };
 
-      requestAnimationFrame(() => {
-        trainingHook.setExerciseActive((oldExerciseActive) => {
-          if (!oldExerciseActive) return null;
+      setExerciseActive((oldExerciseActive) => {
+        if (!oldExerciseActive) return null;
 
-          return {
-            ...oldExerciseActive,
-            weight: weightValue,
-          };
-        });
+        return {
+          ...oldExerciseActive,
+          weight: weightValue,
+        };
       });
       void updateStorageData(exerciseUpdated);
     }
   };
 
   const getIndexLastExercise = () => {
-    const trainingExercises = trainingHook.trainingActive?.exercises;
-    const currentExerciseId = trainingHook.exerciseActive?.id;
+    const trainingExercises = trainingActive?.exercises;
+    const currentExerciseId = exerciseActive?.id;
 
     if (trainingExercises) {
       return trainingExercises.findIndex(
@@ -150,17 +148,15 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   };
 
   const canBackExercise = () => {
-    const exercisesList = trainingHook.trainingActive?.exercises;
+    const exercisesList = trainingActive?.exercises;
 
-    const isFirstExercise = exercisesList?.[0]?.id === trainingHook.exerciseActive?.id;
+    const isFirstExercise = exercisesList?.[0]?.id === exerciseActive?.id;
 
     return !exercisesList || !exercisesList[0] || isFirstExercise;
   };
 
   const isLastExercise = (): boolean => {
     const indexLastExercise = getIndexLastExercise();
-    const trainingActive = trainingHook.trainingActive;
-
     if (trainingActive && indexLastExercise === trainingActive.exercises.length - 1) return true;
 
     return false;
@@ -175,23 +171,19 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   };
 
   const handleChangeAnnotation = (text: string) => {
-    const exerciseActive = trainingHook.exerciseActive;
-
     if (exerciseActive) {
       const exerciseUpdated: ExerciseModel = {
         ...exerciseActive,
         annotation: text,
       };
 
-      requestAnimationFrame(() => {
-        trainingHook.setExerciseActive((oldExerciseActive) => {
-          if (!oldExerciseActive) return null;
+      setExerciseActive((oldExerciseActive) => {
+        if (!oldExerciseActive) return null;
 
-          return {
-            ...oldExerciseActive,
-            annotation: text,
-          };
-        });
+        return {
+          ...oldExerciseActive,
+          annotation: text,
+        };
       });
       void updateStorageData(exerciseUpdated);
     }
@@ -222,23 +214,19 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   };
 
   const handleChangeTimer = (timerValue: string) => {
-    const exerciseActive = trainingHook.exerciseActive;
-
     if (exerciseActive) {
       const exerciseUpdated: ExerciseModel = {
         ...exerciseActive,
         timer: timerValue,
       };
 
-      requestAnimationFrame(() => {
-        trainingHook.setExerciseActive((oldExerciseActive) => {
-          if (!oldExerciseActive) return null;
+      setExerciseActive((oldExerciseActive) => {
+        if (!oldExerciseActive) return null;
 
-          return {
-            ...oldExerciseActive,
-            timer: timerValue,
-          };
-        });
+        return {
+          ...oldExerciseActive,
+          timer: timerValue,
+        };
       });
       void updateStorageData(exerciseUpdated);
     }
@@ -246,28 +234,25 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
 
   const handlePressNavigateNext = () => {
     const indexLastExercise = getIndexLastExercise();
-    const trainingActive = trainingHook.trainingActive;
-
     if (!trainingActive) return;
 
     if (isLastExercise()) {
       void createExercise();
       setRepetitionValue(null);
     } else {
-      trainingHook.setExerciseActive(trainingActive.exercises[indexLastExercise + 1]);
+      setExerciseActive(trainingActive.exercises[indexLastExercise + 1]);
     }
 
     navigation.push("Workout");
   };
 
   const handlePressNavigateBack = () => {
-    const trainingActive = trainingHook.trainingActive;
     const indexLastExercise = getIndexLastExercise();
 
     if (trainingActive) {
       const lastExercise = trainingActive.exercises[indexLastExercise - 1];
 
-      trainingHook.setExerciseActive(lastExercise);
+      setExerciseActive(lastExercise);
       navigation.goBack();
     }
   };
@@ -314,7 +299,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
 
           <Box pr={"8"}>
             <TextArea
-              value={trainingHook.exerciseActive?.annotation}
+              value={exerciseActive?.annotation}
               onChangeText={handleChangeAnnotation}
               autoCompleteType={true}
               placeholder="Digite aqui suas anotações..."
@@ -352,13 +337,13 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
                 onChangeInput={currentTooltip === "repetitions" ? undefined : setRepetitionValue}
                 onPressCaretDown={currentTooltip === "repetitions" ? undefined : setRepetitionValue}
                 onPressCaretUp={currentTooltip === "repetitions" ? undefined : setRepetitionValue}
-                maxNumber={trainingHook.exerciseActive?.repetitions}
+                maxNumber={exerciseActive?.repetitions}
               />
               <Text fontSize={"lg"} color={"text.900"} fontWeight={"medium"}>
                 de
               </Text>
               <VerticalNumberInput
-                value={trainingHook.exerciseActive?.repetitions}
+                value={exerciseActive?.repetitions}
                 onChangeInput={
                   currentTooltip === "repetitions" ? undefined : handleChangeMaxRepetition
                 }
@@ -395,7 +380,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
             </Text>
 
             <WeightInput
-              value={trainingHook.exerciseActive?.weight || ""}
+              value={exerciseActive?.weight || ""}
               onChangeInput={currentTooltip === "weight" ? () => {} : handleChangeWeight}
               onPressLess={currentTooltip === "weight" ? () => {} : handlePressLessWeight}
               onPressPlus={currentTooltip === "weight" ? () => {} : handlePressPlusWeight}
@@ -405,7 +390,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
 
         <VStack>
           <ExerciseTimer
-            timerValue={trainingHook.exerciseActive?.timer || "2:00"}
+            timerValue={exerciseActive?.timer || "2:00"}
             onChangeTimerValue={handleChangeTimer}
           />
 
@@ -443,7 +428,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
                 name="fire"
                 size={45}
                 color={
-                  repetitionValue === trainingHook.exerciseActive?.repetitions
+                  repetitionValue === exerciseActive?.repetitions
                     ? theme.colors.primary[500]
                     : theme.colors.muted[400]
                 }
@@ -484,7 +469,7 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
                 fontSize: 12,
               }}
             >
-              {trainingHook.exerciseActive?.muscles.length || 0}
+              {exerciseActive?.muscles.length || 0}
             </Badge>
 
             <CustomAnimated.IconButton
