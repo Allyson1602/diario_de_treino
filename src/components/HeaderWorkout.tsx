@@ -11,6 +11,9 @@ import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
 import { WalkthroughContext } from "../contexts/walkthrough.context";
 import { CustomAnimated } from "./ui/CustomAnimated";
+import { useRecoilState } from "recoil";
+import { exerciseActiveState } from "../contexts/recoil/exerciseActiveState";
+import { trainingActiveState } from "../contexts/recoil/trainingActiveState";
 
 const DEFAULT_EXERCISE_NAME = "Exercício";
 
@@ -23,6 +26,8 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
 
   const [isActive, setIsActive] = useState(false);
   const [exerciseNameValue, setExerciseNameValue] = useState(DEFAULT_EXERCISE_NAME);
+  const [exerciseActive, setExerciseActive] = useRecoilState(exerciseActiveState);
+  const [trainingActive, setTrainingActive] = useRecoilState(trainingActiveState);
 
   const defineGoBackAnimationOnPress = () => {
     cancelAnimation(scale);
@@ -46,8 +51,6 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
   };
 
   const handleChangeText = (text: string) => {
-    const exerciseActive = trainingHook.exerciseActive;
-
     if (!exerciseActive) return;
 
     setExerciseNameValue(text);
@@ -57,7 +60,7 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
       name: text,
     };
 
-    const exercisesTraining = trainingHook.trainingActive?.exercises || [];
+    const exercisesTraining = trainingActive?.exercises || [];
 
     const hasExerciseTraining = exercisesTraining.some(({ id }) => id === exerciseUpdated.id);
     let updateExercisesTraining: ExerciseModel[] = [];
@@ -75,11 +78,11 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
     }
 
     trainingHook.updateStorageData({
-      ...trainingHook.trainingActive!,
+      ...trainingActive!,
       exercises: updateExercisesTraining,
     });
 
-    trainingHook.setExerciseActive(exerciseUpdated);
+    setExerciseActive(exerciseUpdated);
   };
 
   useFocusEffect(
@@ -92,10 +95,10 @@ export const HeaderWorkout: FunctionComponent<NativeStackHeaderProps> = (props) 
 
   useFocusEffect(
     useCallback(() => {
-      if (trainingHook.exerciseActive) {
-        setExerciseNameValue(trainingHook.exerciseActive.name);
+      if (exerciseActive) {
+        setExerciseNameValue(exerciseActive.name);
       }
-    }, [trainingHook.exerciseActive]),
+    }, [exerciseActive]),
   );
 
   return (
