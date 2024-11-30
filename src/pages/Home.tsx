@@ -26,7 +26,7 @@ import { getAllMuscleTraining } from "../helpers/getAllMuscleTraining";
 import { useTraining } from "../hooks/useTraining";
 import { TrainingModel } from "../models/training.model";
 import { RootStackParamList } from "../navigation";
-import { WalkthroughContext } from "../redux/walkthrough.context";
+import { WalkthroughContext } from "../contexts/walkthrough.context";
 import userMetadataStorage from "../storages/userMetadata.storage";
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, "Home", "RootStack">;

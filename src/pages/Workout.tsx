@@ -26,15 +26,7 @@ import { WeightInput } from "../components/WeightInput";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
 import { RootStackParamList } from "../navigation";
-import { useAppDispatch } from "../redux/hooks";
-import {
-  setAnnotationExercise,
-  setRepetitionsExercise,
-  setTimerExercise,
-  setWeightExercise,
-} from "../redux/slices/exerciseSlice";
-import { setExercise as setTrainingExercise } from "../redux/slices/trainingSlice";
-import { WalkthroughContext } from "../redux/walkthrough.context";
+import { WalkthroughContext } from "../contexts/walkthrough.context";
 import userMetadataStorage from "../storages/userMetadata.storage";
 
 type WorkoutProps = NativeStackScreenProps<RootStackParamList, "Workout", "RootStack">;
@@ -44,7 +36,6 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
   const trainingHook = useTraining();
   const finishDisclose = useDisclose();
   const muscleDisclose = useDisclose();
-  const dispatch = useAppDispatch();
   const { currentTooltip, setCurrentTooltip } = useContext(WalkthroughContext);
 
   const [repetitionValue, setRepetitionValue] = useState<number | null>(null);
@@ -73,7 +64,14 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       exercises: updateExercisesTraining,
     });
 
-    dispatch(setTrainingExercise(exerciseUpdated));
+    trainingHook.setTrainingActive((oldTrainingActive) => {
+      if (!oldTrainingActive) return null;
+
+      return {
+        ...oldTrainingActive,
+        exercises: updateExercisesTraining,
+      };
+    });
   };
 
   const updateRepetitionsData = (repetitionNumberValue: number | null) => {
@@ -85,9 +83,15 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
         repetitions: repetitionNumberValue || 0,
       };
 
-      requestAnimationFrame(() => {
-        dispatch(setRepetitionsExercise(repetitionNumberValue || undefined));
+      trainingHook.setExerciseActive((oldExerciseActive) => {
+        if (!oldExerciseActive) return null;
+
+        return {
+          ...oldExerciseActive,
+          repetitions: repetitionNumberValue || undefined,
+        };
       });
+
       void updateStorageData(exerciseUpdated);
     }
   };
@@ -119,7 +123,14 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       requestAnimationFrame(() => {
-        dispatch(setWeightExercise(weightValue));
+        trainingHook.setExerciseActive((oldExerciseActive) => {
+          if (!oldExerciseActive) return null;
+
+          return {
+            ...oldExerciseActive,
+            weight: weightValue,
+          };
+        });
       });
       void updateStorageData(exerciseUpdated);
     }
@@ -173,7 +184,14 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       requestAnimationFrame(() => {
-        dispatch(setAnnotationExercise(text));
+        trainingHook.setExerciseActive((oldExerciseActive) => {
+          if (!oldExerciseActive) return null;
+
+          return {
+            ...oldExerciseActive,
+            annotation: text,
+          };
+        });
       });
       void updateStorageData(exerciseUpdated);
     }
@@ -213,7 +231,14 @@ export const Workout: FunctionComponent<WorkoutProps> = ({ navigation }) => {
       };
 
       requestAnimationFrame(() => {
-        dispatch(setTimerExercise(timerValue));
+        trainingHook.setExerciseActive((oldExerciseActive) => {
+          if (!oldExerciseActive) return null;
+
+          return {
+            ...oldExerciseActive,
+            timer: timerValue,
+          };
+        });
       });
       void updateStorageData(exerciseUpdated);
     }

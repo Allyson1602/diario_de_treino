@@ -9,7 +9,7 @@ import { cancelAnimation, useSharedValue, withTiming } from "react-native-reanim
 import Tooltip from "react-native-walkthrough-tooltip";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
-import { WalkthroughContext } from "../redux/walkthrough.context";
+import { WalkthroughContext } from "../contexts/walkthrough.context";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
 const DEFAULT_EXERCISE_NAME = "Exercício";

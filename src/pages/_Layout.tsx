@@ -6,8 +6,8 @@ import { Provider } from "react-redux";
 import { nativeBaseConfig, theme } from "../configs/themes/theme";
 import { toastConfig } from "../configs/toast";
 import { Navigation } from "../navigation";
-import { store } from "../redux/store";
-import { WalkthroughContext, WalkthroughValueType } from "../redux/walkthrough.context";
+import { WalkthroughContext, WalkthroughValueType } from "../contexts/walkthrough.context";
+import { RecoilRoot } from "recoil";
 
 export const Layout: FunctionComponent = () => {
   const [currentTooltip, setCurrentTooltip] = useState<WalkthroughValueType>("");
@@ -17,7 +17,7 @@ export const Layout: FunctionComponent = () => {
       <StatusBar style="dark" animated translucent />
 
       <NativeBaseProvider theme={theme} config={nativeBaseConfig}>
-        <Provider store={store}>
+        <RecoilRoot>
           <WalkthroughContext.Provider
             value={{
               currentTooltip,
@@ -26,7 +26,7 @@ export const Layout: FunctionComponent = () => {
           >
             <Navigation />
           </WalkthroughContext.Provider>
-        </Provider>
+        </RecoilRoot>
       </NativeBaseProvider>
 
       <Toast config={toastConfig} topOffset={16} />

@@ -4,8 +4,6 @@ import { FunctionComponent, useCallback, useState } from "react";
 import { muscleGroups } from "../data/muscleGroups";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
-import { useAppDispatch } from "../redux/hooks";
-import { setMusclesExercise } from "../redux/slices/exerciseSlice";
 import { Chip } from "./Chip";
 
 interface IMuscleModal {
@@ -16,7 +14,6 @@ interface IMuscleModal {
 export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }) => {
   const theme = useTheme();
   const trainingHook = useTraining();
-  const dispatch = useAppDispatch();
 
   const [musclesSelected, setMusclesSelected] = useState<string[]>([]);
 
@@ -70,7 +67,15 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
       };
 
       void updateStorageData(updatedExercise);
-      dispatch(setMusclesExercise(musclesSelected));
+
+      trainingHook.setExerciseActive((oldExerciseActive) => {
+        if (!oldExerciseActive) return null;
+
+        return {
+          ...oldExerciseActive,
+          muscles: musclesSelected,
+        };
+      });
     }
   };
 

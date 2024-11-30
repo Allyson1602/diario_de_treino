@@ -8,26 +8,25 @@ import { mostDefinedValueTimer } from "../helpers/mostDefinedValueTimer";
 import { IStorageData } from "../interfaces/storageData";
 import { ExerciseModel } from "../models/exercise.model";
 import { TrainingModel } from "../models/training.model";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { setExercise } from "../redux/slices/exerciseSlice";
-import { setTraining } from "../redux/slices/trainingSlice";
 import { StorageKeys } from "../storages/_storageKeys";
 import trainingStorage from "../storages/training.storage";
+import { SetterOrUpdater, useRecoilState } from "recoil";
+import { trainingActiveState } from "../contexts/recoil/trainingActiveState";
+import { exerciseActiveState } from "../contexts/recoil/exerciseActiveState";
 
 interface IUseTraining extends IStorageData<TrainingModel> {
   exerciseActive: ExerciseModel | null;
-  setExerciseActive: (newExercise: ExerciseModel | null) => void;
+  setExerciseActive: SetterOrUpdater<ExerciseModel | null>;
   trainingActive: TrainingModel | null;
-  setTrainingActive: (newExercise: TrainingModel | null) => void;
+  setTrainingActive: SetterOrUpdater<TrainingModel | null>;
   removeExercise: (exerciseRemove: ExerciseModel) => Promise<boolean>;
   createExercise: () => Promise<ExerciseModel>;
   createTraining: () => Promise<TrainingModel>;
 }
 
 export const useTraining = (): IUseTraining => {
-  const exerciseActive = useAppSelector((state) => state.exercise.value);
-  const trainingActive = useAppSelector((state) => state.training.value);
-  const dispatch = useAppDispatch();
+  const [trainingActive, setTrainingActive] = useRecoilState(trainingActiveState);
+  const [exerciseActive, setExerciseActive] = useRecoilState(exerciseActiveState);
 
   const getMoreRecentExercise = (): ExerciseModel | null => {
     if (trainingActive) {
@@ -125,14 +124,6 @@ export const useTraining = (): IUseTraining => {
       repetitions: mostUsedRepetitions,
       createdDate: moment().format(),
     };
-  };
-
-  const setTrainingActive = (newTraining: TrainingModel | null) => {
-    dispatch(setTraining(newTraining));
-  };
-
-  const setExerciseActive = (newExercise: ExerciseModel | null) => {
-    dispatch(setExercise(newExercise));
   };
 
   const removeExercise = async (exerciseRemove: ExerciseModel) => {
