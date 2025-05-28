@@ -3,7 +3,7 @@ import { Box, HStack, Text, useTheme } from "native-base";
 import { FunctionComponent, useContext } from "react";
 import { cancelAnimation, SharedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import Tooltip from "react-native-walkthrough-tooltip";
-import { WalkthroughContext } from "../redux/walkthrough.context";
+import { WalkthroughContext } from "../contexts/walkthrough.context";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
 interface ExerciseNavigationProps {
@@ -50,7 +50,6 @@ export const ExerciseNavigation: FunctionComponent<ExerciseNavigationProps> = (p
       }
       onClose={() => setCurrentTooltip("finished")}
       placement="top"
-      topAdjustment={-24}
     >
       <HStack
         justifyContent={"space-around"}

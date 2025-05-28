@@ -9,7 +9,7 @@ import { cancelAnimation, useSharedValue, withTiming } from "react-native-reanim
 import Toast from "react-native-toast-message";
 import Tooltip from "react-native-walkthrough-tooltip";
 import { useTraining } from "../hooks/useTraining";
-import { WalkthroughContext } from "../redux/walkthrough.context";
+import { WalkthroughContext } from "../contexts/walkthrough.context";
 import userMetadataStorage from "../storages/userMetadata.storage";
 import { CustomAnimated } from "./ui/CustomAnimated";
 
@@ -158,7 +158,6 @@ export const HeaderTraining: FunctionComponent<NativeStackHeaderProps> = (props)
               userMetadataStorage.toggleTutorialTraining();
             }}
             placement="bottom"
-            topAdjustment={-24}
           >
             <Pressable
               flex={"1"}

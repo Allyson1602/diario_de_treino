@@ -4,9 +4,10 @@ import { FunctionComponent, useCallback, useState } from "react";
 import { muscleGroups } from "../data/muscleGroups";
 import { useTraining } from "../hooks/useTraining";
 import { ExerciseModel } from "../models/exercise.model";
-import { useAppDispatch } from "../redux/hooks";
-import { setMusclesExercise } from "../redux/slices/exerciseSlice";
 import { Chip } from "./Chip";
+import { useRecoilState } from "recoil";
+import { trainingActiveState } from "../contexts/recoil/trainingActiveState";
+import { exerciseActiveState } from "../contexts/recoil/exerciseActiveState";
 
 interface IMuscleModal {
   isOpen: boolean;
@@ -16,9 +17,10 @@ interface IMuscleModal {
 export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }) => {
   const theme = useTheme();
   const trainingHook = useTraining();
-  const dispatch = useAppDispatch();
 
   const [musclesSelected, setMusclesSelected] = useState<string[]>([]);
+  const [trainingActive, setTrainingActive] = useRecoilState(trainingActiveState);
+  const [exerciseActive, setExerciseActive] = useRecoilState(exerciseActiveState);
 
   const checkMuscle = (musclesList: string[], muscleUpdated: string) => {
     return musclesList.some((muscleItem) => muscleItem === muscleUpdated);
@@ -39,7 +41,7 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
   };
 
   const updateStorageData = (exerciseUpdated: ExerciseModel) => {
-    let exercisesTraining = trainingHook.trainingActive?.exercises || [];
+    let exercisesTraining = trainingActive?.exercises || [];
 
     exercisesTraining = exercisesTraining.map((exerciseItem) => {
       if (exerciseItem.id === exerciseUpdated.id) {
@@ -49,20 +51,18 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
       return exerciseItem;
     });
 
-    trainingHook.setTrainingActive({
-      ...trainingHook.trainingActive!,
+    setTrainingActive({
+      ...trainingActive!,
       exercises: exercisesTraining,
     });
 
     trainingHook.updateStorageData({
-      ...trainingHook.trainingActive!,
+      ...trainingActive!,
       exercises: exercisesTraining,
     });
   };
 
   const updateMuscleExercise = (): void => {
-    const exerciseActive = trainingHook.exerciseActive;
-
     if (exerciseActive) {
       const updatedExercise: ExerciseModel = {
         ...exerciseActive,
@@ -70,16 +70,22 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
       };
 
       void updateStorageData(updatedExercise);
-      dispatch(setMusclesExercise(musclesSelected));
+
+      setExerciseActive((oldExerciseActive) => {
+        if (!oldExerciseActive) return null;
+
+        return {
+          ...oldExerciseActive,
+          muscles: musclesSelected,
+        };
+      });
     }
   };
 
   const handleCloseModal = () => {
     onClose();
 
-    requestAnimationFrame(() => {
-      updateMuscleExercise();
-    });
+    updateMuscleExercise();
   };
 
   const handlePressMuscleChip = (muscleUpdated: string) => {
@@ -88,8 +94,8 @@ export const MuscleModal: FunctionComponent<IMuscleModal> = ({ isOpen, onClose }
 
   useFocusEffect(
     useCallback(() => {
-      setMusclesSelected(trainingHook.exerciseActive?.muscles || []);
-    }, [trainingHook.exerciseActive?.muscles]),
+      setMusclesSelected(exerciseActive?.muscles || []);
+    }, [exerciseActive?.muscles]),
   );
 
   return (
